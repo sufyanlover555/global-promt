@@ -1,0 +1,21 @@
+{
+  "name": "global-generator-studio",
+  "version": "1.0.0",
+  "description": "Global Generator 8K Master AI Story & Prompt Studio with Access Control",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed-admin": "node seed-admin.js"
+  },
+  "keywords": [
+    "ai",
+    "prompts",
+    "video-generator",
+    "licensing"
+  ],
+  "author": "Sufyan Habib",
+  "license": "ISC",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
