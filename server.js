@@ -68,7 +68,7 @@ function verifyAiAccess(user) {
         return {
             allowed: false,
             status: 401,
-            error: 'Unauthorized: براہ کرم پہلے لاگ ان کریں (Please log in to continue).'
+            error: 'Unauthorized: Please log in to continue.'
         };
     }
 
@@ -80,7 +80,7 @@ function verifyAiAccess(user) {
         return {
             allowed: false,
             status: 403,
-            error: 'آپ کا access administrator نے بند کر دیا ہے۔ (Your access has been blocked by administrator).'
+            error: 'Your access has been suspended by administrator. Support contact: 03008998381'
         };
     }
 
@@ -88,7 +88,7 @@ function verifyAiAccess(user) {
         return {
             allowed: false,
             status: 403,
-            error: 'آپ کی payment verification کے لیے pending ہے۔ (Your subscription is pending admin approval).'
+            error: 'Your subscription is pending admin approval.'
         };
     }
 
@@ -96,7 +96,7 @@ function verifyAiAccess(user) {
         return {
             allowed: false,
             status: 403,
-            error: 'آپ کی subscription ختم ہو چکی ہے۔ Tool دوبارہ استعمال کرنے کے لیے نیا Plan خریدیں۔ (Your subscription has expired).'
+            error: 'Your subscription has expired. Please renew your plan.'
         };
     }
 
@@ -104,7 +104,7 @@ function verifyAiAccess(user) {
         return {
             allowed: false,
             status: 403,
-            error: 'آپ کی ادائیگی مسترد کر دی گئی ہے۔ تفصیلات کے لیے ایڈمن سے رابطہ کریں۔ (Payment rejected by administrator).'
+            error: 'Payment was rejected by administrator. Please contact support.'
         };
     }
 
@@ -112,7 +112,7 @@ function verifyAiAccess(user) {
         return {
             allowed: false,
             status: 403,
-            error: 'آپ کا اکاؤنٹ فعال نہیں ہے۔ (Your account is not active).'
+            error: 'Your account is not active.'
         };
     }
 
@@ -122,7 +122,7 @@ function verifyAiAccess(user) {
         return {
             allowed: false,
             status: 403,
-            error: 'آپ کا subscription ختم ہو چکا ہے۔ (Your subscription has expired).'
+            error: 'Your subscription has expired.'
         };
     }
 
@@ -153,120 +153,212 @@ function formatTimestampRange(i) {
 // ============================================================
 // ZERO-FAILURE PRODUCTION SYNTHESIZER (Guaranteed 5 to 120 Scenes)
 // ============================================================
-function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', sceneCount = 60, camera = 'Cinematic 35mm Anamorphic') {
+// Deep Topic Semantic Analyzer & World Engine
+function analyzeTopicAndBuildWorld(topic, style = 'Cinematic 8K Master', sceneCount = 60, camera = 'Cinematic 35mm Anamorphic') {
     const t = (topic || '').toLowerCase();
     const count = Math.min(120, Math.max(3, parseInt(sceneCount, 10) || 60));
 
-    let genre = 'Cinematic Action & Narrative Adventure';
-    let envName = 'High-tension urban perimeter and architectural glass skyline';
+    let genre = 'Cinematic Thriller & Narrative Mission';
+    let envName = 'Atmospheric perimeter with architectural glass and high-rise skyline view';
     let envDetails = 'cinematic sunset golden hour, dramatic shadows, anamorphic lens flares, 8K ultra-detailed environment';
     let characters = [];
 
-    if (t.includes('مغل') || t.includes('تاریخ') || t.includes('بادشاہ') || t.includes('قلعہ') || t.includes('جنگجو') || t.includes('sword') || t.includes('historical') || t.includes('warrior') || t.includes('ottoman') || t.includes('sultan')) {
-        genre = 'Historical Epic & Royal Warrior Chronicle';
-        envName = '16th-century grand Mughal fortress courtyard and ornate red sandstone battlements';
-        envDetails = 'flickering brass torchlight, royal Persian carpets, intricately carved marble archways, dusty golden sunlight';
+    if (t.includes('mughal') || t.includes('history') || t.includes('king') || t.includes('fort') || t.includes('sword') || t.includes('historical') || t.includes('warrior') || t.includes('ottoman') || t.includes('sultan') || t.includes('emperor') || t.includes('lahore')) {
+        genre = 'Historical Imperial Epic & Royal Warrior Chronicle';
+        envName = 'Grand royal fortress courtyard and ornate red sandstone battlements';
+        envDetails = 'flickering brass torchlight, royal Persian carpets, intricately carved marble archways, dusty golden sunlight, architectural symmetry';
         characters = [
             {
-                name: "Hamza Khan (حمزہ خان)",
-                role: "شاہی کمانڈر و شمشیر زن (Royal Mughal Commander)",
-                age: "34 سال",
-                gender: "مردانہ (Male)",
-                body: "مضبوط کسرتی جسم، 6 فٹ قد، گندمی رنگت، فولادی جبڑا اور پرعزم نگاہیں",
-                facialFeatures: "گھنی تراشی ہوئی سیاہ داڑھی، تیکھی ناک، گہری عقابی بھوری آنکھیں، ماتھے پر ہلکا جنگی نشان",
-                clothing: "گہرے نیوی بلیو اور زیتونی سلک کا شاہی انگورکھا، سینے پر دمشقی اسٹیل کا سنہری کندہ شدہ زرہ بکتر، کمر پر زری والا کٹار پٹکا اور براؤن لیدر بوٹس",
-                dnaLockToken: "[LOCKED_DNA_HAMZA: 34yo warrior, olive/navy silk angarkha, Damascus steel chest armor, trimmed dark beard, eagle eyes, zero morphing]"
+                name: "Hamza Khan (Royal Commander)",
+                role: "Royal Commander & Vanguard Swordsman",
+                age: "34 Years",
+                gender: "Male",
+                body: "Muscular athletic warrior physique, 6'0\", weathered bronze complexion, hardened jawline and keen eagle gaze",
+                facialFeatures: "Groomed dark beard, sharp aquiline nose, deep brown eyes, faint tactical duel scar on brow",
+                clothing: "Deep navy blue and olive silk royal angarkha, Damascus steel chest armor with gold filigree, ornate dagger sash, and brown leather boots",
+                dnaLockToken: "[LOCKED_DNA_HAMZA: 34yo warrior, olive/navy silk angarkha, Damascus steel chest armor, trimmed dark beard, eagle eyes, zero morphing, strictly locked wardrobe]"
             },
             {
-                name: "Zoya Bano (زویا بانو)",
-                role: "شاہی انٹیلیجنس مشیر و تیر انداز (Royal Strategist)",
-                age: "28 سال",
-                gender: "زنانہ (Female)",
-                body: "چست ایتھلیٹک جسم، 5 فٹ 7 انچ، شہدی رنگت اور شاہانہ وقار",
-                facialFeatures: "لمبے سیاہ ریشمی بال، تیکھی چمکدار آنکھیں، چہرے پر باریک شاہی نقاب اور پروقار مسکراہٹ",
-                clothing: "گہرے قرمزی ریشم کا کڑھائی دار قمیض شلوار، کندھے پر چمڑے کا تیر دان، کمر پر سونے کا پٹکا اور مخملی جوتے",
-                dnaLockToken: "[LOCKED_DNA_ZOYA: 28yo female, crimson embroidered silk attire, royal archer quiver, sharp amber eyes, zero morphing]"
+                name: "Zoya Bano (Royal Strategist)",
+                role: "Royal Intelligence Strategist & Master Archer",
+                age: "28 Years",
+                gender: "Female",
+                body: "Agile athletic build, 5'7\", honey-olive complexion, commanding regal composure",
+                facialFeatures: "Long flowing dark silk hair, sharp striking eyes, delicate silk veil, and focused determined expression",
+                clothing: "Embroidered crimson and gold silk tunic, leather back quiver, gold woven sash, and velvet riding boots",
+                dnaLockToken: "[LOCKED_DNA_ZOYA: 28yo female, crimson embroidered silk attire, royal archer quiver, sharp amber eyes, zero morphing, strictly locked wardrobe]"
             }
         ];
-    } else if (t.includes('سائبر') || t.includes('مستقبل') || t.includes('روبوٹ') || t.includes('cyber') || t.includes('sci-fi') || t.includes('future') || t.includes('neon') || t.includes('matrix')) {
+    } else if (t.includes('samurai') || t.includes('ninja') || t.includes('katana') || t.includes('japan') || t.includes('ronin') || t.includes('shogun')) {
+        genre = 'Feudal Japanese Masterpiece & Samurai Chronicle';
+        envName = 'Ancient mist-veiled bamboo forest grove and weathered wooden Shinto temple shrine';
+        envDetails = 'swirling bamboo leaves, distant mountain fog, rain drops hitting stone lanterns, soft diffused lantern glow';
+        characters = [
+            {
+                name: "Kenji Takahashi (Master Ronin)",
+                role: "Master Swordsman & Lone Wanderer",
+                age: "36 Years",
+                gender: "Male",
+                body: "Lean powerful martial build, 5'11\", battle-hardened posture, calm calculating focus",
+                facialFeatures: "Tied black topknot hair, rugged stubble, sharp dark eyes, weathered cheekbones",
+                clothing: "Midnight indigo dyed cotton hakama, hardened lacquered black iron sode armor, wrapped katana sheath sash, waraji sandals",
+                dnaLockToken: "[LOCKED_DNA_KENJI: 36yo male, tied topknot, indigo hakama, lacquered black shoulder armor, dual katanas, zero morphing, strictly locked wardrobe]"
+            }
+        ];
+    } else if (t.includes('space') || t.includes('galaxy') || t.includes('planet') || t.includes('astronaut') || t.includes('alien') || t.includes('spaceship') || t.includes('mars') || t.includes('orbit') || t.includes('cosmic') || t.includes('star')) {
+        genre = 'Deep Space Odyssey & Interstellar Expedition';
+        envName = 'Hostile extraterrestrial canyon with towering crystalline mineral spires';
+        envDetails = 'bioluminescent violet soil, swirling crimson atmospheric dust, twin orbital moons on the horizon, high-contrast stellar illumination';
+        characters = [
+            {
+                name: "Commander Leo Vance (Expedition Lead)",
+                role: "Deep Space Commander & Astrobiologist",
+                age: "38 Years",
+                gender: "Male",
+                body: "Athletic astronaut physique, 6'1\", poised composed stance",
+                facialFeatures: "Close-cropped brown hair, focused slate blue eyes, clean-shaven chiseled jaw",
+                clothing: "Reinforced matte white EVA pressure suit with polarized gold-reflective visor, magnetic utility boots, integrated oxygen harness, carbon-fiber wrist display",
+                dnaLockToken: "[LOCKED_DNA_LEO: 38yo male, matte white EVA suit, polarized gold visor, carbon wrist display, blue eyes, zero morphing, strictly locked wardrobe]"
+            }
+        ];
+    } else if (t.includes('ocean') || t.includes('submarine') || t.includes('underwater') || t.includes('trench') || t.includes('marine') || t.includes('diver') || t.includes('abyss')) {
+        genre = 'Abyssal Deep-Sea Exploration & Underwater Standoff';
+        envName = 'Submerged oceanic research facility exterior beside a hydrothermal abyssal chasm';
+        envDetails = 'bioluminescent deep-sea fauna, murky cobalt ocean currents, high-intensity yellow underwater floodlights, floating micro-particles';
+        characters = [
+            {
+                name: "Captain Drake Larson (Deep-Sea Specialist)",
+                role: "Atmospheric Diver & Submersible Commander",
+                age: "40 Years",
+                gender: "Male",
+                body: "Broad rugged build, 6'0\", sturdy posture adapted to oceanic depths",
+                facialFeatures: "Salt-and-pepper short hair, rugged weathered face, keen blue eyes",
+                clothing: "Heavy atmospheric diving suit in matte slate grey with high-intensity chest floodlights, titanium pressure joints, rebreather unit, magnetic diver boots",
+                dnaLockToken: "[LOCKED_DNA_DRAKE: 40yo male, slate grey atmospheric diving suit, titanium joints, chest floodlights, blue eyes, zero morphing, strictly locked wardrobe]"
+            }
+        ];
+    } else if (t.includes('cyber') || t.includes('sci-fi') || t.includes('future') || t.includes('robot') || t.includes('neon') || t.includes('matrix') || t.includes('android')) {
         genre = 'Cyberpunk High-Tech Syndicate';
         envName = 'Rain-drenched Neo-Tokyo megacity alleyways and holographic corporate spire';
         envDetails = 'vivid magenta and cyan neon tube reflections, puddles on dark asphalt, towering volumetric holographic billboards';
         characters = [
             {
                 name: "Riven 'Ghost' Cross",
-                role: "سائبر ٹیک انفلٹریٹر (Cyber Infiltrator)",
-                age: "28 سال",
-                gender: "مردانہ (Male)",
-                body: "لچکدار ایتھلیٹک جسم، 5 فٹ 11 انچ، سنہری جلد اور تیز ریفلیکسز",
-                facialFeatures: "شارٹ سلور سفید بال، دائیں کنپٹی پر گلوئنگ نیلی بائیو چپ، سرمئی آنکھیں اور تیکھا چہرہ",
-                clothing: "میٹ بلیک نیوپرین ٹیکٹیکل لانگ جیکٹ مع الیکٹرو لیومنسنٹ وائلٹ پائپنگ، ہائی ٹیک ویسٹ اور واٹر پروف سائبر کمبیٹ بوٹس",
-                dnaLockToken: "[LOCKED_DNA_RIVEN: 28yo male, silver undercut hair, matte black tactical jacket with violet piping, blue temple optic, zero morphing]"
+                role: "Cyber Tech Infiltrator & Combat Operative",
+                age: "28 Years",
+                gender: "Male",
+                body: "Lean athletic build, 5'11\", warm golden skin tone, rapid tactical reflexes",
+                facialFeatures: "Short silver undercut hair, glowing cyan ocular implant on right temple, slate grey eyes, angular jaw",
+                clothing: "Matte black neoprene tactical coat with electroluminescent violet piping, high-tech modular harness, waterproof combat boots",
+                dnaLockToken: "[LOCKED_DNA_RIVEN: 28yo male, silver undercut hair, matte black tactical jacket with violet piping, blue temple optic, zero morphing, strictly locked wardrobe]"
             },
             {
                 name: "Aria Vance",
-                role: "سائبر ہیکر و سگنل انٹیل (Signal Specialist)",
-                age: "26 سال",
-                gender: "زنانہ (Female)",
-                body: "پھرتیلی جسامت، 5 فٹ 7 انچ قد، روشن نیلی نگاہیں",
-                facialFeatures: "جیٹ بلیک ایسیمیٹرک بوب کٹ، چہرے پر پرسکون فوکس، کان پر ہولوگرافک کمیونیکیٹر",
-                clothing: "چارکول گرے ریفلیکٹیو ہوڈی، بلیک کارگو جوگرز، فنگر لیس ٹیکٹیکل دستانے اور ڈیٹا ہارڈ ڈرائیوز ہارنیس",
-                dnaLockToken: "[LOCKED_DNA_ARIA: 26yo female, jet black bob, charcoal reflective hoodie, bright blue eyes, zero morphing]"
+                role: "Cyber Specialist & Signal Intelligence",
+                age: "26 Years",
+                gender: "Female",
+                body: "Agile slender build, 5'7\", alert stance, striking cobalt eyes",
+                facialFeatures: "Jet black asymmetric bob cut, calm intense focus, holographic comms ear-cuff",
+                clothing: "Charcoal reflective tech-fleece hoodie, black cargo joggers, fingerless tactical gloves, modular data drive harness",
+                dnaLockToken: "[LOCKED_DNA_ARIA: 26yo female, jet black bob, charcoal reflective hoodie, bright blue eyes, zero morphing, strictly locked wardrobe]"
             }
         ];
-    } else if (t.includes('بینک') || t.includes('ڈکیتی') || t.includes('heist') || t.includes('robbery') || t.includes('vault') || t.includes('gta') || t.includes('police')) {
+    } else if (t.includes('bank') || t.includes('heist') || t.includes('robbery') || t.includes('vault') || t.includes('gta') || t.includes('police') || t.includes('syndicate') || t.includes('mafia')) {
         genre = 'High-Stakes Tactical Heist & Pursuit';
         envName = 'Subterranean reinforced titanium bank vault and marble atrium floor';
         envDetails = 'gleaming polished white marble, red laser security tripwires, dim green emergency backup lights, alarm strobe pulses';
         characters = [
             {
                 name: "Mateo Cruz",
-                role: "ہائیسٹ ماسٹر مائنڈ (Mastermind Lead)",
-                age: "35 سال",
-                gender: "مردانہ (Male)",
-                body: "چوڑے مضبوط کندھے، باوقار چال ڈھال، 6 فٹ قد اور گہری بھوری آنکھیں",
-                facialFeatures: "سلکڈ بیک ڈارک ہیئر، باریک شیو، پرسکون مسکراہٹ اور الرٹ نگاہیں",
-                clothing: "ڈارک چارکول سلک لینن سوٹ جیکٹ، اندر کالی ٹی شرٹ، کیولر کنسیلڈ ویسٹ، لیدر ڈرائیونگ گلوز اور لگژری واچ",
-                dnaLockToken: "[LOCKED_DNA_MATEO: 35yo male, slicked dark hair, charcoal linen jacket, tactical inner vest, leather driving gloves, zero morphing]"
+                role: "Mastermind & Syndicate Lead",
+                age: "35 Years",
+                gender: "Male",
+                body: "Broad athletic shoulders, commanding posture, 6'0\", deep brown eyes",
+                facialFeatures: "Slicked-back dark hair, neat stubble, composed confident smile, vigilant gaze",
+                clothing: "Dark charcoal linen suit jacket over black tee, concealed kevlar vest, leather driving gloves, luxury chronograph, tailored black trousers",
+                dnaLockToken: "[LOCKED_DNA_MATEO: 35yo male, slicked dark hair, charcoal linen jacket, tactical inner vest, leather driving gloves, zero morphing, strictly locked wardrobe]"
             },
             {
                 name: "Lucia Santos",
-                role: "ٹیکٹیکل پوائنٹ آپریٹو (Tactical Specialist)",
-                age: "29 سال",
-                gender: "زنانہ (Female)",
-                body: "ایتھلیٹک ٹونڈ باڈی، لاطینی گندمی رنگت، 5 فٹ 8 انچ قد",
-                facialFeatures: "ہائی پونی ٹیل سیاہ بال، تیکھے گال کی ہڈیاں، ہیزل آنکھیں مع پرعزم تاثر",
-                clothing: "کریمسن ریڈ ٹیکٹیکل فارم فٹنگ جیکٹ، بلیک ریپ اسٹاپ کارگو پینٹس، ٹیکٹیکل تھائی ہولسٹر اور کمبیٹ بوٹس",
-                dnaLockToken: "[LOCKED_DNA_LUCIA: 29yo female, high black ponytail, crimson tactical jacket, hazel eyes, tactical holster, zero morphing]"
+                role: "Tactical Point Specialist & Infiltrator",
+                age: "29 Years",
+                gender: "Female",
+                body: "Athletic toned physique, sun-kissed olive complexion, 5'8\"",
+                facialFeatures: "High slick ponytail, high cheekbones, striking hazel eyes with focused resolve",
+                clothing: "Crimson tactical form-fitting windbreaker, black ripstop cargo pants, tactical drop-leg holster, combat boots",
+                dnaLockToken: "[LOCKED_DNA_LUCIA: 29yo female, high black ponytail, crimson tactical jacket, hazel eyes, tactical holster, zero morphing, strictly locked wardrobe]"
+            }
+        ];
+    } else if (t.includes('military') || t.includes('soldier') || t.includes('war') || t.includes('sniper') || t.includes('commando') || t.includes('army') || t.includes('spec-ops')) {
+        genre = 'Tier-1 Spec-Ops Recon & Tactical Engagement';
+        envName = 'Rugged forward operating combat base and fortified mountain perimeter';
+        envDetails = 'tactical sandbag redoubts, dense dust smoke plumes, dawn morning haze, harsh directional sunlight through razor wire';
+        characters = [
+            {
+                name: "Major Cole 'Reaper' Sterling",
+                role: "Spec-Ops Vanguard Commander",
+                age: "35 Years",
+                gender: "Male",
+                body: "Tough muscular military frame, 6'2\", intense battle-hardened posture",
+                facialFeatures: "Crew cut brown hair, tactical shadow stubble, steely grey eyes, scar across right cheek",
+                clothing: "Multicam tactical combat shirt, modular plate carrier with trauma plates, tactical radio harness, coyote brown ripstop trousers, tactical combat boots",
+                dnaLockToken: "[LOCKED_DNA_COLE: 35yo male, crew cut, multicam tactical combat shirt, modular plate carrier, grey eyes, zero morphing, strictly locked wardrobe]"
+            }
+        ];
+    } else if (t.includes('desert') || t.includes('wasteland') || t.includes('apocalypse') || t.includes('zombie') || t.includes('survival') || t.includes('ruins')) {
+        genre = 'Post-Apocalyptic Survival & Wasteland Odyssey';
+        envName = 'Sun-bleached apocalyptic canyon with rusted skyscraper ruins half-buried in sand';
+        envDetails = 'swirling dust devils, heat shimmer distortion, harsh golden sun, abandoned armored convoy chassis';
+        characters = [
+            {
+                name: "Jax Kaelen (Wasteland Survivor)",
+                role: "Scavenger Vanguard & Tactical Marksman",
+                age: "33 Years",
+                gender: "Male",
+                body: "Wiry athletic survivor build, 6'0\", weather-beaten bronze complexion",
+                facialFeatures: "Disheveled dusty dark hair, protective respirator collar, focused hawk-like brown eyes",
+                clothing: "Weathered brown leather duster over distressed canvas utility vest, protective respirator half-mask, patched tactical cargo pants, steel-toed combat boots",
+                dnaLockToken: "[LOCKED_DNA_JAX: 33yo male, brown leather duster, canvas utility vest, respirator collar, brown eyes, zero morphing, strictly locked wardrobe]"
             }
         ];
     } else {
         genre = 'Cinematic Thriller & Mission Chronicle';
-        envName = 'Atmospheric perimeter with architectural glass and high-rise skyline view';
-        envDetails = 'cinematic sunset golden hour, dramatic shadows, anamorphic lens flares, 8K ultra-detailed environment';
+        envName = `Atmospheric ${topic.replace(/[^a-zA-Z0-9\s]/g, '').trim()} setting`;
+        envDetails = 'cinematic sunset golden hour, dramatic shadows, volumetric light beams, 8K ultra-detailed architectural textures';
         characters = [
             {
-                name: "Zain Malik (زین ملک)",
-                role: "لیڈ انویسٹیگیٹر و آپریٹو (Lead Operative)",
-                age: "31 سال",
-                gender: "مردانہ (Male)",
-                body: "مضبوط کسرتی جسم، 6 فٹ 1 انچ، گندمی رنگت اور تیز مشاہدہ",
-                facialFeatures: "شارٹ ملٹری فیڈ سیاہ بال، ہلکی شیو، گہری امبر بھوری آنکھیں اور پرعزم انداز",
-                clothing: "زیتونی سبز ٹیکٹیکل فیلڈ جیکٹ، اندر ڈارک گرے ہینلی شرٹ، کسٹم کیولر ہولسٹر، ڈارک ڈینم اور کمبیٹ بوٹس",
-                dnaLockToken: "[LOCKED_DNA_ZAIN: 31yo male, military fade hair, olive green tactical field jacket, amber eyes, combat boots, zero morphing]"
+                name: "Zain Malik (Lead Operative)",
+                role: "Lead Field Operative & Tactician",
+                age: "31 Years",
+                gender: "Male",
+                body: "Muscular athletic build, 6'1\", sun-tanned complexion, acute spatial awareness",
+                facialFeatures: "Short textured military crop, groomed shadow stubble, amber-brown eyes",
+                clothing: "Olive drab tactical utility jacket, dark grey henley, concealed holster, dark raw denim, assault boots",
+                dnaLockToken: "[LOCKED_DNA_ZAIN: 31yo male, military fade hair, olive green tactical field jacket, amber eyes, combat boots, zero morphing, strictly locked wardrobe]"
             },
             {
-                name: "Maya Lin (مایا لن)",
-                role: "سائبر و ٹیکٹیکل کوآرڈینیٹر (Tactical Coordinator)",
-                age: "27 سال",
-                gender: "زنانہ (Female)",
-                body: "ایتھلیٹک سمارٹ جسامت، 5 فٹ 8 انچ، الرٹ نگاہیں",
-                facialFeatures: "سلک ڈارک براؤن بال جو سائیڈ بینگز میں کٹے ہیں، ہائی ٹیک ایئر پیس، تیز مشاہدہ",
-                clothing: "میٹ نیوی کارگو بمبر، اندر ڈارک ٹیکٹیکل ٹاپ، کنسیلڈ ہولسٹر اور کمبیٹ اسنیکرز",
-                dnaLockToken: "[LOCKED_DNA_MAYA: 27yo female, dark brown side-bang hair, navy tactical bomber, smart comms earpiece, zero morphing]"
+                name: "Maya Lin (Tactical Coordinator)",
+                role: "Tactical Coordinator & Cyber Recon",
+                age: "27 Years",
+                gender: "Female",
+                body: "Athletic runner physique, 5'8\", alert focus",
+                facialFeatures: "Dark brown angled bob with side bangs, sleek titanium comms earpiece, sharp observant gaze",
+                clothing: "Matte navy cargo bomber, dark technical base layer, tactical utility belt, low-profile tactical sneakers",
+                dnaLockToken: "[LOCKED_DNA_MAYA: 27yo female, dark brown side-bang hair, navy tactical bomber, smart comms earpiece, zero morphing, strictly locked wardrobe]"
             }
         ];
     }
+
+    return { genre, envName, envDetails, characters, count };
+}
+
+function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', sceneCount = 60, camera = 'Cinematic 35mm Anamorphic') {
+    const world = analyzeTopicAndBuildWorld(topic, style, sceneCount, camera);
+    const count = world.count;
+    const genre = world.genre;
+    const envName = world.envName;
+    const envDetails = world.envDetails;
+    const characters = world.characters;
 
     const leadChar = characters[0];
     const secChar = characters.length > 1 ? characters[1] : null;
@@ -287,7 +379,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
     const narrativePhases = [
         {
             act: "Act I: Covert Inception & Perimeter Arrival",
-            titleUrdu: "شروعات، آمد اور ماحول کا جائزہ",
+            title: "Covert Arrival & Perimeter Recon",
             actions: [
                 "infiltrates the perimeter quietly, surveying the perimeter landscape while checking tactical equipment",
                 "holds position behind cover, scanning the environment for security patrols and temporal blindspots",
@@ -303,7 +395,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act II: Tactical Breach & Security Override",
-            titleUrdu: "بیرونی رکاوٹ عبور اور سیکیورٹی بائی پاس",
+            title: "Tactical Breach & Security Override",
             actions: [
                 "executes precision electronic bypass on the perimeter gate, sparks dancing off the terminal",
                 "signals low and maneuvers through the shadow corridor, matching movement to the rhythmic strobe pulse",
@@ -319,7 +411,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act III: Deep Penetration & Subterranean Infiltration",
-            titleUrdu: "گہری پیش قدمی اور اندرونی راستوں کا انتظام",
+            title: "Deep Infiltration & Subterranean Navigation",
             actions: [
                 "descends into the inner complex corridor, shadows lengthening dramatically along the walls",
                 "inspects the structural blueprint on a wrist console, adjusting trajectory towards the inner vault",
@@ -335,7 +427,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act IV: The Discovery & Intelligence Acquisition",
-            titleUrdu: "مرکزی ہدف کی دریافت اور خفیہ رازوں کا انکشاف",
+            title: "Objective Discovery & Intelligence Acquisition",
             actions: [
                 "reaches the grand central chamber, eyes fixing upon the luminous target resting in the reinforced chamber",
                 "initiates high-speed optical download, holographic numerals reflecting across focused pupils",
@@ -351,7 +443,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act V: The Complication & Alarm Trigger",
-            titleUrdu: "ناگہانی خطرہ، الارم اور سائرن کی گونج",
+            title: "Complication, Warning Strobes & Lockdown",
             actions: [
                 "reacts instantly as red emergency warning strobes bathe the chamber in pulsing crimson light",
                 "snaps into dynamic low cover as heavy blast doors seal off the main exit with an echoing crash",
@@ -367,7 +459,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act VI: High-Stakes Tactical Crossfire & Skirmish",
-            titleUrdu: "شدید تصادم اور حکمت عملی کے ساتھ جوابی کارروائی",
+            title: "Tactical Crossfire & Suppression Engagement",
             actions: [
                 "unleashes rapid tactical suppression fire, muzzle flashes cutting through the swirling smoke",
                 "slides beneath a collapsing steel beam, coming up into a ready stance to neutralize incoming threats",
@@ -383,7 +475,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act VII: The Turning Point & Decisive Confrontation",
-            titleUrdu: "فیصلہ کن موڑ اور مرکزی رکاوٹ کا خاتمہ",
+            title: "Decisive Climax & Primary Barrier Breach",
             actions: [
                 "confronts the elite adversary commander in a high-tension standoff, eyes narrowing with steely resolve",
                 "executes an extraordinary close-quarters maneuver, disarming the rival operative with cinematic speed",
@@ -399,7 +491,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act VIII: The High-Speed Breakout & Pursuit",
-            titleUrdu: "تیز رفتار فرار اور چھتوں / گاڑیوں پر تعاقب",
+            title: "High-Speed Breakout & Vehicle Pursuit",
             actions: [
                 "bursts through shattered glass onto the elevated open balcony, sprinting full speed against the wind",
                 "leaps across a rooftop chasm with breathtaking athletic agility, rolling cleanly onto the landing platform",
@@ -415,7 +507,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act IX: Aerial / Tactical Extraction & Payoff",
-            titleUrdu: "حتمی انخلاء اور محفوظ زون میں داخلہ",
+            title: "Tactical Extraction & Secure Airspace Ingress",
             actions: [
                 "latches onto the dangling extraction cable as rescue transport roars overhead against the dusk sky",
                 "pulls inside the transport compartment, extending a hand to secure the partner amidst rushing wind",
@@ -431,7 +523,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         },
         {
             act: "Act X: Climax Payoff, Golden Sunset & Final Resolution",
-            titleUrdu: "عظیم الشان انجام، فتح اور مستقل شناخت کا تاثر",
+            title: "Climax Resolution & Silhouette Payoff",
             actions: [
                 "stands tall in the open cabin bay as golden twilight sunlight illuminates the triumphant silhouette",
                 "secures tactical gear, signature outfit completely intact, gazing towards the horizon with unshakeable confidence",
@@ -463,18 +555,15 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         const specificAction = phase.actions[actionSubIdx];
         const dialogue = phase.dialogues[dialogueSubIdx];
 
-        const sceneTitle = `منظر ${num} / ${count}: ${phase.titleUrdu} (${phase.act})`;
+        const sceneTitle = `Shot ${num} / ${count}: ${phase.title} (${phase.act})`;
 
-        let actionDesc = "";
-        if (secChar && (i % 2 === 1 || i % 3 === 0)) {
-            actionDesc = `${leadChar.name} (${leadChar.dnaLockToken}) and ${secChar.name} (${secChar.dnaLockToken}), dressed in their locked outfits, ${specificAction} in ${envName}`;
-        } else {
-            actionDesc = `${leadChar.name} (${leadChar.dnaLockToken}), wearing locked ${leadChar.clothing}, ${specificAction} in ${envName}`;
-        }
+        const sequenceTag = (i === 0)
+            ? `Shot 1 / ${count} (Establishing Inception)`
+            : `Shot ${num} / ${count} (Chronological Continuity: Follows immediately from Shot ${num - 1})`;
 
-        const videoPrompt = `${leadChar.name} in ${leadChar.clothing}, ${actionDesc}. ${cameraMovement}. ${envDetails}. photorealistic 8K, Unreal Engine 5.4 Lumen, 35mm lens, 60fps, ultra-detailed`.substring(0, 440);
-        const midjourneyPrompt = `${leadChar.name} in ${leadChar.clothing}, ${actionDesc}, ${envName}, ${envDetails}, shot on 35mm anamorphic lens, 8K ultra-detailed --ar 16:9 --style raw --v 6.1`;
-        const negativePrompt = "blurry, low quality, morphing, deformed hands, extra limbs, distorted face, altered clothes, changed hair, watermark";
+        const videoPrompt = `[Scene Sequence]: ${sequenceTag} | [Camera Rig]: ${cameraMovement} | [Subject & Locked DNA]: ${leadChar.name} [${leadChar.dnaLockToken}] | [Wardrobe Lock]: Wearing identical ${leadChar.clothing} (STRICTLY IDENTICAL COSTUME - ZERO MORPHING - NO WARDROBE CHANGE) | [Action]: ${specificAction} | [Location & Environment]: ${envName}, ${envDetails} | [Production Render]: Photorealistic 8K, Unreal Engine 5.5 Lumen Nanite Raytracing, 35mm film stock, hyper-detailed, award-winning cinematography`;
+        const midjourneyPrompt = `Cinematic movie still, Shot ${num} of ${count}, ${leadChar.name} [${leadChar.dnaLockToken}], wearing identical ${leadChar.clothing} (locked costume), ${specificAction}, set in ${envName}, ${envDetails}, captured on ARRI Alexa 65 with Panavision Anamorphic 35mm, Kodak Vision3 500T 5219 film stock, volumetric atmospheric lighting, photorealistic 8k, award-winning cinematography --ar 16:9 --style raw --v 6.1 --q 2`;
+        const negativePrompt = "morphing, shifting clothes, changing wardrobe, different outfit, altered costume, distorted face, changing hair, extra limbs, deformed hands, duplicate subjects, cartoonish, low resolution, bad anatomy, text, watermark";
 
         scenes.push({
             number: num,
@@ -490,7 +579,7 @@ function synthesizeProductionForTopic(topic, style = 'Cinematic 8K Master', scen
         });
     }
 
-    const storyOverview = `موضوع: "${topic}"\nیہ کہانی ایک مکمل تسلسل، ربط اور منطقی بہاؤ کے ساتھ کل ${count} مناظر پر مشتمل تیار کی گئی ہے۔ اس میں ہر منظر کا پچھلے منظر کے ساتھ مضبوط تعلق ہے، اور کردار کا لباس، رنگ، عمر، چہرہ اور ڈی این اے مکمل طور پر تمام مناظر میں محفوظ اور لاک رکھا گیا ہے تاکہ AI ویڈیوز میں کوئی روپ یا لباس تبدیل نہ ہو۔`;
+    const storyOverview = `Topic: "${topic}"\nGenre: ${genre}\nThis master cinematic production is engineered across ${count} chronological scenes with locked character continuity. Character appearance, signature wardrobe, facial geometry, and DNA tokens remain 100% consistent across all shots to eliminate AI character morphing.`;
 
     return {
         genre,
@@ -511,7 +600,7 @@ function expandProductionToCount(parsedData, topic, style, targetCount, camera) 
 
     const fallback = synthesizeProductionForTopic(topic, style, targetCount, camera);
 
-    // Ensure valid characters
+    // Ensure valid characters with locked DNA and clothing
     let characters = parsedData.characters;
     if (!Array.isArray(characters) || characters.length === 0) {
         characters = fallback.characters;
@@ -524,13 +613,27 @@ function expandProductionToCount(parsedData, topic, style, targetCount, camera) 
         return fallback;
     }
 
-    // If exactly equal, just normalize timestamps and numbering
+    // If exactly equal, normalize timestamps, wardrobe locks and numbering
     if (existingScenes.length === targetCount) {
-        parsedData.scenes = existingScenes.map((s, idx) => ({
-            ...s,
-            number: idx + 1,
-            timestamp: formatTimestampRange(idx)
-        }));
+        parsedData.scenes = existingScenes.map((s, idx) => {
+            const num = idx + 1;
+            let vPrompt = s.videoPrompt || fallback.scenes[idx].videoPrompt;
+            if (!vPrompt.includes(leadChar.clothing) && leadChar.clothing) {
+                vPrompt = `[Scene Sequence]: Shot ${num} of ${targetCount} | [Subject & Locked DNA]: ${leadChar.name} [${leadChar.dnaLockToken}] | [Wardrobe Lock]: Wearing identical ${leadChar.clothing} | ${vPrompt}`.substring(0, 500);
+            }
+            let mjPrompt = s.midjourneyPrompt || fallback.scenes[idx].midjourneyPrompt;
+            if (!mjPrompt.includes('--v 6.1')) {
+                mjPrompt += ' --ar 16:9 --style raw --v 6.1';
+            }
+            return {
+                ...s,
+                number: num,
+                timestamp: formatTimestampRange(idx),
+                videoPrompt: vPrompt,
+                midjourneyPrompt: mjPrompt,
+                negativePrompt: s.negativePrompt || fallback.scenes[idx].negativePrompt
+            };
+        });
         return parsedData;
     }
 
@@ -563,7 +666,7 @@ function expandProductionToCount(parsedData, topic, style, targetCount, camera) 
 
         let title = anchor.title || synthScene.title;
         if (!title.includes(`${num} / ${targetCount}`)) {
-            title = `منظر ${num} / ${targetCount}: ${title.replace(/^Scene\s*\d+:\s*/i, '').replace(/^منظر\s*\d+:\s*/i, '')}`;
+            title = `Shot ${num} / ${targetCount}: ${title.replace(/^(Scene|Shot)\s*\d+:\s*/i, '')}`;
         }
 
         const cameraMovement = anchor.camera || synthScene.camera;
@@ -573,7 +676,7 @@ function expandProductionToCount(parsedData, topic, style, targetCount, camera) 
         let videoPrompt = anchor.videoPrompt || synthScene.videoPrompt;
         // Ensure character locked wardrobe is embedded
         if (!videoPrompt.includes(leadChar.clothing) && leadChar.clothing) {
-            videoPrompt = `${leadChar.name} (${leadChar.dnaLockToken}), wearing ${leadChar.clothing}, ${videoPrompt}`.substring(0, 440);
+            videoPrompt = `[Scene Sequence]: Shot ${num} of ${targetCount} | [Subject & Locked DNA]: ${leadChar.name} [${leadChar.dnaLockToken}] | [Wardrobe Lock]: Wearing identical ${leadChar.clothing} | ${videoPrompt}`.substring(0, 500);
         }
 
         let midjourneyPrompt = anchor.midjourneyPrompt || synthScene.midjourneyPrompt;
@@ -748,7 +851,7 @@ const server = http.createServer(async (req, res) => {
                     token: session.token,
                     user: {
                         id: adminUser ? adminUser.id : 'admin_master',
-                        name: adminUser ? adminUser.name : 'سفیان حبیب (Sufyan Habib)',
+                        name: adminUser ? adminUser.name : 'Sufyan Habib',
                         email: masterAdminEmail,
                         role: 'ADMIN',
                         status: 'ACTIVE'
@@ -765,13 +868,13 @@ const server = http.createServer(async (req, res) => {
 
             const user = db.getUserByEmail(cleanEmail);
             if (!user) {
-                sendJson(res, 401, { error: 'غلط ای میل یا پاس ورڈ (Invalid email or password)' });
+                sendJson(res, 401, { error: 'Invalid email or password' });
                 return;
             }
 
             const valid = db.verifyPassword(password, user.password_hash, user.salt);
             if (!valid) {
-                sendJson(res, 401, { error: 'غلط ای میل یا پاس ورڈ (Invalid email or password)' });
+                sendJson(res, 401, { error: 'Invalid email or password' });
                 return;
             }
 
@@ -859,11 +962,11 @@ const server = http.createServer(async (req, res) => {
                 durationLabel: '30 Days',
                 currency: 'PKR',
                 features: [
-                    'مکمل 8K سنیماٹک اسکرپٹ جنریٹر',
-                    'ڈائنامک کریکٹر ڈی این اے مستقل لاک',
-                    'Zero-Failure ویڈیو پرامپٹس (Kling, Runway, Luma)',
-                    'Midjourney v6.1 کی فریم پرامپٹس',
-                    'تیز رفتار Groq LPU کلاؤڈ پروسیسنگ'
+                    'Full 8K Cinematic Screenplay Generator',
+                    'Dynamic Character DNA Consistency Lock',
+                    'Zero-Failure Video Prompts (Kling, Runway, Luma, Sora)',
+                    'Midjourney v6.1 & FLUX.1 Keyframe Visual Prompts',
+                    'High-Speed Groq LPU Cloud Acceleration'
                 ]
             },
             {
@@ -875,11 +978,11 @@ const server = http.createServer(async (req, res) => {
                 currency: 'PKR',
                 popular: true,
                 features: [
-                    '6 ماہ کی بلا تعطل رسائی (6 Months)',
-                    'تمام ماہانہ پلان کے تمام فیچرز',
-                    'ترجیحی AI پراسیسنگ اسپیڈ',
-                    'لامحدود اسکرپٹ ٹیکسٹ ڈاؤنلوڈز',
-                    '24/7 واٹس ایپ و ایڈمن سپورٹ'
+                    '6 Months Full Unrestricted Studio Access',
+                    'All Monthly Plan Features Included',
+                    'Priority AI Processing Speed',
+                    'Unlimited Production Script Downloads',
+                    '24/7 Dedicated Administrator Support'
                 ]
             },
             {
@@ -891,13 +994,13 @@ const server = http.createServer(async (req, res) => {
                 currency: 'PKR',
                 badge: 'Best Value',
                 features: [
-                    'مکمل 1 سال (365 Days) لامحدود رسائی',
-                    'تمام 8K سنیماٹک اسکرپٹ جنریٹر و اپڈیٹس',
-                    'ڈائنامک کریکٹر ڈی این اے مستقل لاک',
-                    'Zero-Failure AI ویڈیو پرامپٹس (Kling, Runway, Luma)',
-                    'Midjourney v6.1 کی فریم پرامپٹس',
-                    'تیز رفتار Groq LPU VIP ترجیحی کلاؤڈ پروسیسنگ',
-                    '24/7 ڈائریکٹ واٹس ایپ ترجیحی سپورٹ'
+                    'Full 1 Year (365 Days) Unlimited Access',
+                    'All 8K Cinematic Generator Features & Upgrades',
+                    'Dynamic Character DNA Consistency Lock',
+                    'Zero-Failure AI Video Prompts (Kling, Runway, Luma, Sora)',
+                    'Midjourney v6.1 & FLUX.1 Keyframe Visual Prompts',
+                    'VIP Priority Groq LPU Cloud Acceleration',
+                    'Direct 24/7 Priority Support'
                 ]
             }
         ];
@@ -907,7 +1010,7 @@ const server = http.createServer(async (req, res) => {
             easypaisa: {
                 accountName: settings.easypaisa_account_name || 'GLOBAL GENERATOR OFFICIAL',
                 accountNumber: settings.easypaisa_account_number || '0300-1234567',
-                instructions: settings.payment_instructions || 'Easypaisa کے ذریعے اپنے منتخب کردہ Plan کی رقم ادا کریں۔',
+                instructions: settings.payment_instructions || 'Transfer the plan amount via Easypaisa to the account above.',
                 supportContact: settings.support_contact || 'WhatsApp: +92 300 1234567'
             }
         });
@@ -960,7 +1063,7 @@ const server = http.createServer(async (req, res) => {
 
             sendJson(res, 200, {
                 success: true,
-                message: 'آپ کی payment verification کے لیے بھیج دی گئی ہے۔ Admin verification کے بعد آپ کا account activate کیا جائے گا۔',
+                message: 'Your payment details have been submitted for verification. Your account will be activated upon administrator review.',
                 paymentId: result.id
             });
             return;
@@ -1007,7 +1110,7 @@ const server = http.createServer(async (req, res) => {
     if (pathname.startsWith('/api/admin/')) {
         const user = getAuthenticatedUser(req);
         if (!user || user.role !== 'ADMIN') {
-            sendJson(res, 403, { error: 'رسائی ممنوع ہے (Access denied: Admin role required)' });
+            sendJson(res, 403, { error: 'Access denied: Admin role required' });
             return;
         }
 
@@ -1299,7 +1402,7 @@ const server = http.createServer(async (req, res) => {
 
             if (!groqKey || groqKey.trim() === '' || groqKey.startsWith('YOUR_')) {
                 sendJson(res, 500, {
-                    error: 'سرور پر Groq API Key سیٹ نہیں ہے۔ برائے کرم ایڈمن پینل کی سیٹنگز سے Groq API Key درج کریں۔'
+                    error: 'Groq API Key is not configured on the server. Please enter a Groq API key in Admin Settings.'
                 });
                 return;
             }
@@ -1325,43 +1428,40 @@ const server = http.createServer(async (req, res) => {
             if (count === 120) count = 12;
             const sceneCount = Math.min(120, Math.max(3, count));
 
-            const systemPrompt = `You are GLOBAL GENERATOR, the world's elite cinematic story & AI prompt engineering system.
-Your mission is to produce flawless, zero-failure AI prompts with strict narrative continuity and chronological sequence for any topic that work with 100% success on any AI generation tool (Midjourney v6.1, Kling 1.5/2.0, Runway Gen-3, Luma Dream Machine, Sora, Minimax, Hailuo, Pika).
+            const systemPrompt = `You are GLOBAL GENERATOR, the world's premier 8K AI Director & Virtual Production Prompt Engineering System.
+Your mission is to produce masterclass, zero-failure AI generation blueprints with strict narrative continuity and chronological sequencing for any topic, optimized for Kling 1.5/2.0, Runway Gen-3 Alpha, Luma Ray 2, OpenAI Sora, Minimax Hailuo, and Midjourney v6.1 / FLUX.1.
 
-CRITICAL DIRECTIVES:
-1. STRICT NARRATIVE CONTINUITY & CHRONOLOGICAL PROGRESSION (ایک خاص تسلسل، ربط اور منطقی بہاؤ):
+CRITICAL HOLLYWOOD DIRECTIVES:
+1. STRICT NARRATIVE CONTINUITY & CHRONOLOGICAL PROGRESSION:
    - Every scene MUST follow a tight chronological cause-and-effect narrative arc:
-     * Scene 1: Cinematic Establishing Shot & Hook (Introduces lead character, objective, and specific environment).
-     * Scene 2: Inciting Incident / Initial Action (Tension escalates, plan initiated, movement into action).
-     * Scene 3: Peak Confrontation / High-Stakes Climax (Peak action beat, adrenaline, tactical maneuver or encounter).
-     * Scene 4+: Climax Payoff & Resolution (Cinematic aftermath, victory, escape, or transition to the next chapter).
-   - Temporal & Environmental Continuity: Weather, time-of-day, color grading palette, and geographical location must remain logically consistent across scenes.
+     * Act 1 (Beginning): Cinematic establishing shot, hook, character introduction, spatial geography.
+     * Act 2 (Escalation): Tactical infiltration, inciting action beat, rising tension, confrontation.
+     * Act 3 (Climax): High-octane climax beat, decisive resolution, evasion or breakthrough.
+     * Act 4 (Payoff): Grand resolution, atmospheric aftermath, triumphant cinematic silhouette.
+   - Temporal, environmental, and color grading continuity: lighting ratios, weather, time-of-day, and geography remain seamlessly consistent.
 
-2. UNBREAKABLE CHARACTER VISUAL DNA, WARDROBE & AGE LOCK (بصری شناخت، ملبوسات، عمر، ڈی این اے کبھی تبدیل نہیں ہوں گے):
-   - For every character, define an UNBREAKABLE VISUAL DNA:
-     * Exact age (e.g. 29 years old)
-     * Exact physical build & height (e.g. 6'0 athletic tactical build)
-     * Distinct facial features (exact eye color, hair style/color, facial hair, skin tone, scars)
-     * Signature locked wardrobe (e.g. 'crimson red bomber jacket with silver zippers, black ribbed tactical undershirt, dark cargo pants, combat boots')
-     * Compact DNA Lock Token: [LOCKED_DNA_NAME: age, facial features, exact clothing colors/materials, zero morphing]
-   - IN EVERY SINGLE SCENE where a character appears, their EXACT wardrobe (colors, garments, materials) and DNA token MUST be explicitly mentioned!
-   - Under NO CIRCUMSTANCES should characters change outfits, hair, facial features, or age mid-story.
+2. UNBREAKABLE CHARACTER VISUAL DNA & SIGNATURE WARDROBE LOCK (NO MORPHING):
+   - For every character, define an explicit, unbreakable visual identity:
+     * Exact age & height/build (e.g. 32yo athletic tactical build, 6'1")
+     * Facial geometry (eye color, hair style/shade, distinct scars, jawline)
+     * Signature locked wardrobe (e.g. 'matte black tactical turtleneck, low-profile chest harness, dark ripstop cargo pants, assault boots')
+     * Compact DNA Lock Token: [LOCKED_DNA_NAME: age, facial features, exact clothing colors/materials, zero morphing, strictly locked wardrobe]
+   - IN EVERY SINGLE SCENE where a character appears, their EXACT wardrobe and DNA token MUST be explicitly declared:
+     '[Wardrobe Lock]: Wearing identical [exact clothing] (STRICTLY IDENTICAL COSTUME - ZERO MORPHING - NO WARDROBE CHANGE)'
+   - Absolutely NO costume changes, NO outfit switching, and NO hairstyle alterations across any scene.
 
-3. ENVIRONMENT & LOCATION MATCHED TO THE TOPIC (مقام موضوع کے عین مطابق):
-   - Setting, architecture, atmospheric lighting, and weather must be 100% faithful to the user's specific topic (historical Mughal fortress, cyberpunk neon megacity, underground bank vault, arctic base, desert pursuit, etc.).
-   - The location must evolve logically scene-by-scene (e.g., exterior approach -> breached corridor -> inner vault -> rooftop extraction).
-
-4. ZERO-FAILURE PROMPTS FOR ALL AI TOOLS (کوئی پرامپٹ فیل نہیں ہونا چاہیے):
+3. HOLLYWOOD PRODUCTION-GRADE PROMPT SYNTAX:
    - 100% English prompts with zero banned/flagged words.
-   - videoPrompt: under 450 characters, tailored for Kling 1.5/2.0, Runway Gen-3, Luma Dream Machine, Sora.
-     Format: [Character Name with locked clothing & DNA token] + [Dynamic action] + [Specific camera movement, e.g. low-angle tracking dolly push at 60fps] + [Topic environment & lighting] + [photorealistic 8K, Unreal Engine 5.4 Lumen, 35mm lens, hyper-detailed].
-   - midjourneyPrompt: keyframe format ending with --ar 16:9 --style raw --v 6.1.
-   - negativePrompt: blurry, low quality, morphing, deformed hands, extra limbs, distorted face, altered clothes, changed hair, watermark.
+   - videoPrompt: Production-ready structured prompt for Kling, Runway Gen-3, Luma Ray 2, Sora:
+     Format: [Scene Sequence]: Shot X of Y (Chronological Continuity: Follows immediately from previous shot) | [Camera Rig]: (e.g. 35mm Master Anamorphic, dynamic steadycam low-angle tracking at 60fps) | [Subject & Locked DNA]: (Character name, DNA token) | [Wardrobe Lock]: Wearing identical (exact clothing description) (NO WARDROBE CHANGE) | [Action]: (Choreographed beat) | [Location & Environment]: (Topic-matched volumetric atmosphere, 8K raytracing, Unreal Engine 5.5, hyper-detailed).
+   - midjourneyPrompt: Keyframe format with photographic lens descriptors, film stock:
+     Format: Cinematic movie still, Shot X of Y, [Subject with locked DNA], wearing identical [exact clothing], [Action], set in [Topic Environment & Volumetric Lighting], shot on ARRI Alexa 65 with Panavision Anamorphic 35mm, Kodak Vision3 500T 5219, photorealistic 8k, award-winning cinematography --ar 16:9 --style raw --v 6.1 --q 2
+   - negativePrompt: morphing, shifting clothes, changing wardrobe, different outfit, altered costume, distorted face, changing hair, extra limbs, deformed hands, duplicate subjects, cartoonish, low resolution, bad anatomy, text, watermark.
 
-5. DIALOGUES:
-   Must be 100% natural, punchy cinematic English.
+4. DIALOGUES:
+   Must be natural, impactful cinematic Hollywood English dialogue cues.
 
-Return valid JSON:
+Return strictly valid JSON:
 {
   "genre": "string",
   "style": "${style || 'GTA-VI Open-World Cinematic'}",
@@ -1377,7 +1477,7 @@ Return valid JSON:
       "dnaLockToken": "string"
     }
   ],
-  "story": "full engaging cinematic production story overview in Urdu and English",
+  "story": "Complete immersive Hollywood director production story overview in English",
   "scenes": [
     {
       "number": 1,
@@ -1387,12 +1487,12 @@ Return valid JSON:
       "camera": "string",
       "lighting": "string",
       "dialogue": "Punchy cinematic English dialogue",
-      "videoPrompt": "Universal 8K video prompt under 450 chars for Kling, Runway, Luma with locked character clothing and DNA",
-      "midjourneyPrompt": "Midjourney v6.1 prompt ending with --ar 16:9 --style raw --v 6.1",
-      "negativePrompt": "blurry, low quality, morphing, deformed hands, extra limbs, distorted face, watermark"
+      "videoPrompt": "[Camera]: ... | [Subject]: ... | [Action]: ... | [Environment]: ...",
+      "midjourneyPrompt": "Cinematic movie still, ... --ar 16:9 --style raw --v 6.1 --q 2",
+      "negativePrompt": "morphing, deformed limbs, extra fingers, plastic skin, low resolution, distorted face, changed wardrobe, text, watermark"
     }
   ]
-};`;
+};`;;
 
             const modelsToTry = [
                 "qwen/qwen3.8-27b",
@@ -1461,7 +1561,7 @@ Return valid JSON:
         } catch (err) {
             console.error("[Groq Generation Error]:", err.message);
             sendJson(res, 500, {
-                error: 'کہانی بناتے وقت غیر متوقع خرابی پیش آئی۔ (Unexpected error during AI generation).'
+                error: 'Unexpected error during AI generation. Fallback blueprint activated.'
             });
             return;
         }
@@ -1597,7 +1697,7 @@ Return valid JSON:
             const { provider, apiKey, prompt, negativePrompt, duration, aspectRatio } = body;
 
             if (!apiKey) {
-                sendJson(res, 400, { error: 'API Key مطلوب ہے (API Key is required).' });
+                sendJson(res, 400, { error: 'API Key is required.' });
                 return;
             }
 
@@ -1821,7 +1921,7 @@ try {
     const existingAdmin = db.getUserByEmail(adminEmail);
     if (!existingAdmin) {
         const newAdmin = db.createUser({
-            name: 'سفیان حبیب (Sufyan Habib)',
+            name: 'Sufyan Habib',
             email: adminEmail,
             password: adminPass,
             role: 'ADMIN',

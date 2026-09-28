@@ -148,17 +148,17 @@ function updateGatekeeperNotice() {
     if (!noticeBox) return;
 
     if (!currentUser) {
-        noticeBox.className = "p-3 rounded-xl bg-purple-950/80 border border-purple-500/50 text-xs text-purple-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `🔒 <b>Studio License & Subscription Required!</b><br><span class="text-[11px] text-gray-300 font-normal">Please sign in or register to activate your studio license and access all 8K generation tools.</span>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-slate-900/90 border border-indigo-500/40 text-xs text-slate-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `🔒 <b>Studio License & Subscription Required</b><br><span class="text-[11px] text-slate-400 font-normal">Please sign in or register to activate your studio license and access all 8K generation tools.</span>`;
     } else if (currentUser.status === 'PENDING') {
-        noticeBox.className = "p-3 rounded-xl bg-amber-950/90 border border-amber-500/50 text-xs text-amber-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `⏳ <b>Account Pending Admin Access Approval</b><br><span class="text-[11px] text-amber-300 font-normal">Your account has been registered. Sufyan Habib (Administrator) will review and activate your access shortly.</span><div class="mt-2.5 flex flex-wrap items-center justify-center gap-2"><button type="button" onclick="openPaymentModal('${currentUser.subscription?.plan || 'Monthly'}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">💰 Submit Payment Proof</button><button type="button" onclick="fetchCurrentUserProfile()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition">🔄 Check Status</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">Sign Out</button></div>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-amber-950/70 border border-amber-500/50 text-xs text-amber-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `⏳ <b>Account Pending Administrator Approval</b><br><span class="text-[11px] text-amber-300/80 font-normal">Your account is registered. Sufyan Habib (Administrator) will review and activate your access shortly.</span><div class="mt-2.5 flex flex-wrap items-center justify-center gap-2"><button type="button" onclick="openPaymentModal('${currentUser.subscription?.plan || 'Monthly'}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">💰 Submit Payment Proof</button><button type="button" onclick="fetchCurrentUserProfile()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-black text-xs font-bold transition">🔄 Check Status</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Sign Out</button></div>`;
     } else if (currentUser.status === 'EXPIRED') {
-        noticeBox.className = "p-3 rounded-xl bg-red-950/90 border border-red-500/50 text-xs text-red-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `⚠️ <b>Studio License Expired</b><br><span class="text-[11px] text-gray-300 font-normal">Please renew your membership plan to restore 8K generation capabilities.</span><div class="mt-2.5 flex items-center justify-center gap-2"><button type="button" onclick="openPricingModal()" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold transition">View Plans & Renew</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">Sign Out</button></div>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-rose-950/70 border border-rose-500/50 text-xs text-rose-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `⚠️ <b>Studio License Expired</b><br><span class="text-[11px] text-slate-400 font-normal">Please renew your membership plan to restore 8K generation capabilities.</span><div class="mt-2.5 flex items-center justify-center gap-2"><button type="button" onclick="openPricingModal()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition">View Plans & Renew</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Sign Out</button></div>`;
     } else if (currentUser.status === 'BLOCKED' || currentUser.status === 'REJECTED') {
-        noticeBox.className = "p-3 rounded-xl bg-red-950/90 border border-red-500/50 text-xs text-red-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `🚫 <b>Access Suspended (${currentUser.status})</b><br><span class="text-[11px] text-gray-300 font-normal">Account access restricted by administration. Support contact: 03008998381</span><div class="mt-2.5"><button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition">Sign Out</button></div>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-red-950/80 border border-red-500/50 text-xs text-red-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `🚫 <b>Access Suspended (${currentUser.status})</b><br><span class="text-[11px] text-slate-400 font-normal">Account access restricted by administration. Support contact: 03008998381</span><div class="mt-2.5"><button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition">Sign Out</button></div>`;
     } else {
         noticeBox.innerHTML = '';
         noticeBox.className = "hidden";
@@ -357,7 +357,7 @@ function switchAuthTab(tab) {
         if (resetForm) resetForm.classList.add('hidden');
         if (signupForm) signupForm.classList.remove('hidden');
         if (loginTabBtn) loginTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
-        if (signupTabBtn) signupTabBtn.className = "py-2 px-4 text-xs font-bold text-pink-400 border-b-2 border-pink-500 transition cursor-pointer";
+        if (signupTabBtn) signupTabBtn.className = "py-2 px-4 text-xs font-bold text-amber-400 border-b-2 border-amber-500 transition cursor-pointer";
         if (resetTabBtn) resetTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
     } else if (tab === 'reset') {
         if (loginForm) loginForm.classList.add('hidden');
@@ -371,7 +371,7 @@ function switchAuthTab(tab) {
         if (signupForm) signupForm.classList.add('hidden');
         if (resetForm) resetForm.classList.add('hidden');
         if (loginForm) loginForm.classList.remove('hidden');
-        if (loginTabBtn) loginTabBtn.className = "py-2 px-4 text-xs font-bold text-pink-400 border-b-2 border-pink-500 transition cursor-pointer";
+        if (loginTabBtn) loginTabBtn.className = "py-2 px-4 text-xs font-bold text-amber-400 border-b-2 border-amber-500 transition cursor-pointer";
         if (signupTabBtn) signupTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
         if (resetTabBtn) resetTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
     }
@@ -545,7 +545,7 @@ async function openUserDashboardModal() {
         if (activeNotice) activeNotice.classList.remove('hidden');
         if (openGenBtn) {
             openGenBtn.disabled = false;
-            openGenBtn.className = "w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-black font-extrabold text-sm tracking-wider uppercase transition shadow-xl shadow-emerald-500/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2";
+            openGenBtn.className = "w-full py-4 px-6 rounded-2xl director-cta-btn text-black font-black text-sm tracking-wider uppercase transition shadow-2xl active:scale-95 cursor-pointer flex items-center justify-center gap-2";
         }
     } else if (status === 'PENDING') {
         if (pendingNotice) pendingNotice.classList.remove('hidden');
@@ -717,25 +717,25 @@ function renderPricingCards() {
     availablePlans.forEach(p => {
         const isPopular = p.popular;
         html += `
-        <div class="relative glass-panel rounded-2xl p-6 border ${isPopular ? 'border-pink-500 shadow-2xl shadow-pink-500/20' : 'border-gta-border'} flex flex-col justify-between space-y-5">
-            ${isPopular ? `<span class="absolute -top-3 right-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-md">MOST POPULAR</span>` : ''}
+        <div class="relative glass-panel rounded-3xl p-6 border ${isPopular ? 'border-amber-500 shadow-2xl shadow-amber-500/20 ring-1 ring-amber-400/40' : 'border-white/10'} flex flex-col justify-between space-y-5 bg-gradient-to-b from-black/80 to-slate-950/90 viewfinder-card">
+            ${isPopular ? `<span class="absolute -top-3 right-6 bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-[10px] font-black uppercase px-3.5 py-1 rounded-full shadow-lg tracking-wider">MOST POPULAR</span>` : ''}
             <div>
-                <h3 class="text-xl font-extrabold text-white mb-1">${p.name}</h3>
-                <p class="text-xs text-gray-400">${p.durationLabel || `${p.durationDays} Days`} Full Access</p>
+                <h3 class="text-xl font-black text-white mb-1">${p.name}</h3>
+                <p class="text-xs text-gray-400">${p.durationLabel || `${p.durationDays} Days`} Full Studio Access</p>
                 <div class="my-4">
                     <span class="text-3xl font-black text-white">PKR ${Number(p.price).toLocaleString()}</span>
                     <span class="text-xs text-gray-400">/ ${p.durationLabel || `${p.durationDays} Days`}</span>
                 </div>
-                <ul class="space-y-2 text-xs text-gray-300">
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Full 8K Cinematic Screenplay Generator</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Dynamic Character DNA Consistency Lock</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Zero-Failure AI Video Prompts (Kling, Runway, Luma, Sora)</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Midjourney v6.1 Keyframe Visual Prompts</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> High-Speed Groq LPU Cloud Acceleration</li>
+                <ul class="space-y-2.5 text-xs text-gray-300">
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Full 8K Cinematic Screenplay Generator</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Dynamic Character DNA Consistency Lock</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Zero-Failure AI Video Prompts (Kling, Runway, Luma, Sora)</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Midjourney v6.1 & FLUX.1 Keyframe Prompts</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> High-Speed Groq LPU Cloud Acceleration</li>
                 </ul>
             </div>
-            <button onclick="handleSelectPlan('${p.id}')" class="w-full py-3.5 rounded-xl ${isPopular ? 'bg-gradient-to-r from-pink-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white' : 'bg-white/10 hover:bg-white/20 text-white'} font-black text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-lg flex items-center justify-center gap-1.5">
-                <span>💎</span> <span>Buy Plan</span>
+            <button onclick="handleSelectPlan('${p.id}')" class="w-full py-3.5 rounded-2xl ${isPopular ? 'director-cta-btn text-black font-black' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold'} text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-md">
+                <span>💎</span> <span>Select Plan</span>
             </button>
         </div>
         `;
@@ -1179,7 +1179,7 @@ function renderAdminUsersTable(users) {
                     <button onclick="adminUnblockUser('${u.id}')" title="Restore user access" class="px-2 py-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-[10px] transition cursor-pointer">
                         🔓 UNBLOCK
                     </button>`}
-                    <button onclick="adminOpenExtendModal('${u.id}')" title="Extend subscription duration" class="px-2 py-1 bg-purple-700/80 hover:bg-purple-600 text-white rounded text-[10px] transition cursor-pointer">
+                    <button onclick="adminOpenExtendModal('${u.id}')" title="Extend subscription duration" class="px-2 py-1 bg-indigo-700/80 hover:bg-indigo-600 text-white rounded text-[10px] transition cursor-pointer">
                         ⏳ EXTEND
                     </button>
                     <button onclick="adminOpenEditModal('${u.id}')" title="Edit creator profile" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
@@ -1649,7 +1649,7 @@ async function loadAdminAuditLogs() {
             html += `
             <tr class="border-b border-white/5 hover:bg-white/5 transition text-xs">
                 <td class="p-3 font-mono text-gray-400 text-[11px]">${new Date(l.created_at).toLocaleString()}</td>
-                <td class="p-3 font-bold text-pink-400">${l.action}</td>
+                <td class="p-3 font-bold text-indigo-400">${l.action}</td>
                 <td class="p-3 text-gray-300">${l.details}</td>
                 <td class="p-3 text-gray-400 font-mono text-[11px]">${l.admin_email || l.admin_id}</td>
             </tr>
@@ -1727,124 +1727,202 @@ async function adminImportBackup() {
 </script>
     <style>
         :root {
-            --bg-void: #030611;
-            --panel-bg: rgba(10, 15, 29, 0.82);
+            --bg-canvas: #06070A;
+            --panel-bg: rgba(13, 16, 24, 0.82);
             --panel-border: rgba(255, 255, 255, 0.08);
-            --accent-pink: #FF007F;
-            --accent-cyan: #00F0FF;
-            --accent-amber: #F59E0B;
-            --accent-purple: #8B5CF6;
+            --panel-border-hover: rgba(245, 158, 11, 0.45);
+            --accent-gold: #F59E0B;
+            --accent-gold-light: #FDE68A;
+            --accent-amber: #D97706;
+            --accent-cyan: #00F2FE;
+            --accent-emerald: #10B981;
+            --accent-slate: #94A3B8;
         }
         body {
-            background-color: #030611;
+            background-color: #06070A;
             color: #E2E8F0;
-            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(255, 0, 127, 0.08) 0%, transparent 45%),
-                radial-gradient(circle at 85% 20%, rgba(0, 240, 255, 0.07) 0%, transparent 45%),
-                radial-gradient(circle at 50% 85%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
-                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+                radial-gradient(ellipse 95% 45% at 50% -12%, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.06) 50%, transparent 80%),
+                radial-gradient(circle at 10% 25%, rgba(245, 158, 11, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 90% 85%, rgba(6, 182, 212, 0.07) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.016) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px;
             background-attachment: fixed;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.015em;
+        }
+        .studio-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.025em;
         }
         .glass-panel {
-            background: rgba(10, 15, 29, 0.85);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            background: linear-gradient(180deg, rgba(16, 20, 30, 0.85) 0%, rgba(10, 13, 20, 0.88) 100%);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
         .glass-panel-glow {
-            box-shadow: 0 0 35px rgba(255, 0, 127, 0.15), 0 20px 50px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 45px rgba(245, 158, 11, 0.22), 0 20px 48px rgba(0, 0, 0, 0.7);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 35%, #F59E0B 70%, #D97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cyan-gradient-text {
+            background: linear-gradient(135deg, #E0F2FE 0%, #38BDF8 50%, #00F2FE 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .director-gradient-text {
+            background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 45%, #F59E0B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .electric-gradient-text {
+            background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 40%, #F59E0B 80%, #D97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .gta-gradient-text {
-            background: linear-gradient(135deg, #FF007F 0%, #FF8A00 50%, #00F0FF 100%);
+            background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 40%, #F59E0B 80%, #D97706 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .cyber-gradient-text {
-            background: linear-gradient(135deg, #00F0FF 0%, #7928CA 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .director-cta-btn {
+            background: linear-gradient(135deg, #F59E0B 0%, #EAB308 50%, #D97706 100%);
+            color: #06070A;
+            font-weight: 900;
+            box-shadow: 0 0 32px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .gta-border-glow:focus {
-            border-color: #FF007F;
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.35);
+        .director-cta-btn:hover {
+            background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 50%, #B45309 100%);
+            box-shadow: 0 0 45px rgba(245, 158, 11, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+            transform: translateY(-1px);
+        }
+        .director-cta-btn:active {
+            transform: scale(0.98);
+        }
+        .viewfinder-card {
+            position: relative;
+        }
+        .viewfinder-card::before, .viewfinder-card::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            pointer-events: none;
+            border-color: rgba(245, 158, 11, 0.45);
+        }
+        .viewfinder-card::before {
+            top: 6px;
+            left: 6px;
+            border-top: 1.5px solid rgba(245, 158, 11, 0.45);
+            border-left: 1.5px solid rgba(245, 158, 11, 0.45);
+        }
+        .viewfinder-card::after {
+            bottom: 6px;
+            right: 6px;
+            border-bottom: 1.5px solid rgba(245, 158, 11, 0.45);
+            border-right: 1.5px solid rgba(245, 158, 11, 0.45);
+        }
+        .director-input {
+            background: rgba(8, 11, 18, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            color: #FFFFFF;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .director-input:focus {
+            border-color: #F59E0B;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22), 0 0 18px rgba(245, 158, 11, 0.15);
+            outline: none;
         }
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
         }
         /* Studio Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(3, 6, 17, 0.95);
+            background: rgba(6, 7, 10, 0.95);
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.14);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #FF007F;
+            background: #F59E0B;
         }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-pink-600 selection:text-white">
+    </style></head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
     <!-- Top Navigation Header -->
-    <header class="border-b border-gta-border glass-panel sticky top-0 z-50 px-6 py-4">
+    <header class="border-b border-white/10 glass-panel sticky top-0 z-50 px-6 py-3.5">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-pink-600 via-purple-600 to-cyan-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-pink-500/20">
-                    VI
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-700 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-amber-500/25 ring-2 ring-yellow-300/40 flex-shrink-0">
+                    🎬
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-wider text-white flex items-center gap-2">
-                        GLOBAL GENERATOR <span class="gta-gradient-text">GTA-VI & 3D STUDIO</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 uppercase tracking-widest font-mono">Open-World Engine</span>
+                    <h1 class="text-lg md:text-xl font-extrabold tracking-wider text-white flex items-center gap-2 studio-heading">
+                        GLOBAL GENERATOR <span class="gold-gradient-text">8K DIRECTOR STUDIO</span>
+                        <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase tracking-wider font-mono font-semibold">Virtual Production</span>
                     </h1>
-                    <p class="text-xs text-gray-400">Cinematic Story, Character DNA Lock & Direct AI Video Rendering</p>
+                    <p class="text-xs text-gray-400">Cinematic Storyboards • Locked Character DNA • Prompt Engineering Console</p>
                 </div>
+            </div>
+
+            <!-- Director Soundstage HUD Telemetry (Desktop) -->
+            <div class="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-black/60 border border-white/10 font-mono text-[11px] shadow-inner">
+                <span class="flex items-center gap-1.5 text-red-400 font-black">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                    REC ● 24 FPS
+                </span>
+                <span class="text-gray-600">|</span>
+                <span class="text-amber-300 font-semibold">ASPECT: 2.39:1</span>
+                <span class="text-gray-600">|</span>
+                <span class="text-cyan-300 font-semibold">ARRI ALEXA 65 8K</span>
             </div>
 
             <!-- Navigation & User Access Controls -->
             <div class="flex items-center gap-3">
                 <!-- Official Easypaisa Badge -->
-                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-500/50 text-xs text-emerald-300 shadow-md">
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 text-xs text-slate-300 shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span class="font-bold text-gray-300">Easypaisa Beneficiary:</span>
-                    <span class="font-extrabold text-white">Sufyan Habib</span>
-                    <span class="font-mono text-emerald-300 font-bold bg-emerald-900/60 px-2 py-0.5 rounded border border-emerald-500/30">03008998381</span>
+                    <span class="text-slate-400 font-medium">Beneficiary:</span>
+                    <span class="font-bold text-white">Sufyan Habib</span>
+                    <span class="font-mono text-cyan-300 font-semibold bg-cyan-950/60 px-2 py-0.5 rounded-lg border border-cyan-500/30">03008998381</span>
                 </div>
 
-                <button onclick="openPricingModal()" class="px-3 py-1.5 rounded-lg bg-pink-950/60 hover:bg-pink-900 border border-pink-500/40 text-pink-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
+                <button onclick="openPricingModal()" class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer">
                     <span>💎</span> <span>Subscription Plans</span>
                 </button>
 
                 <!-- Admin Button (Hidden by default, shown for ADMIN role) -->
-                <button id="adminNavBtn" onclick="openAdminModal()" class="hidden px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black text-xs font-extrabold transition flex items-center gap-1.5 shadow-lg active:scale-95 cursor-pointer">
+                <button id="adminNavBtn" onclick="openAdminModal()" class="hidden px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black text-xs font-black transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer">
                     <span>👑</span> <span>Mission Control</span>
                 </button>
 
                 <!-- Logged Out Pill -->
                 <div id="loggedOutControls" class="flex items-center gap-2">
-                    <button onclick="openAuthModal('login')" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold transition shadow-lg shadow-pink-600/20 active:scale-95 cursor-pointer">
+                    <button onclick="openAuthModal('login')" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold text-xs transition shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer">
                         🔑 Login / Register
                     </button>
                 </div>
 
                 <!-- Logged In User Pill -->
                 <div id="loggedInControls" class="hidden flex items-center gap-2">
-                    <button onclick="openUserDashboardModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-900/90 border border-gta-border hover:border-pink-500/50 transition cursor-pointer text-xs">
-                        <span class="w-6 h-6 rounded-full bg-pink-600/30 text-pink-300 font-bold flex items-center justify-center text-[11px]">👤</span>
+                    <button onclick="openUserDashboardModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 hover:border-amber-500/50 transition cursor-pointer text-xs">
+                        <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center text-[11px]">👤</span>
                         <span id="navUserName" class="text-white font-bold">User</span>
-                        <span id="navUserBadge" class="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
+                        <span id="navUserBadge" class="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">PENDING</span>
                     </button>
-                    <button onclick="handleLogout()" title="Sign Out" class="px-2.5 py-1.5 rounded-lg bg-red-950/50 hover:bg-red-900 border border-red-500/40 text-red-300 text-xs font-bold transition cursor-pointer">
+                    <button onclick="handleLogout()" title="Sign Out" class="px-2.5 py-1.5 rounded-xl bg-red-950/50 hover:bg-red-900 border border-red-500/40 text-red-300 text-xs font-bold transition cursor-pointer">
                         🚪
                     </button>
                 </div>
@@ -1857,17 +1935,17 @@ async function adminImportBackup() {
         
         <!-- Left Panel: Control & GTA 6 Presets (5 Cols) -->
         <section class="lg:col-span-5 space-y-6">
-            <div class="glass-panel p-6 rounded-2xl border border-gta-border space-y-5 shadow-2xl">
+            <div class="glass-panel p-6 rounded-3xl border border-white/10 space-y-5 shadow-2xl relative">
                 
                 <!-- Quick Preset Selector (GTA 6 & Google Flow Styles) -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <label class="text-xs font-bold uppercase tracking-wider text-pink-400 flex items-center gap-1.5">
+                        <label class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 studio-heading">
                             <span>🔥</span> 24 Cinematic Storyboard Presets
                         </label>
                         <!-- Clickable 8 Presets Badge: Clicking here switches to the next set of 8 topics -->
                         <button type="button" onclick="cycleTopicPage()" id="topicPageToggleBtn" 
-                            class="text-[11px] px-2.5 py-1 rounded-lg bg-pink-950/80 hover:bg-pink-900 border border-pink-500/50 text-pink-300 hover:text-white font-bold transition flex items-center gap-1.5 shadow-md shadow-pink-950/50 active:scale-95 cursor-pointer"
+                            class="text-[11px] px-2.5 py-1 rounded-xl bg-black/60 hover:bg-white/10 border border-white/10 text-amber-300 hover:text-white font-semibold transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
                             title="Click to cycle next set of 8 presets">
                             <span>🔄</span>
                             <span id="topicPageBadge">8 Presets (GTA-VI • Page 1/3) 🔄</span>
@@ -1876,7 +1954,7 @@ async function adminImportBackup() {
 
                     <!-- Category Tabs for Instant Direct Switching -->
                     <div class="flex items-center gap-1.5 mb-2.5 overflow-x-auto pb-1 text-[11px] font-bold">
-                        <button type="button" onclick="setTopicPage(0)" id="topicTab-0" class="topic-cat-tab px-2.5 py-1 rounded-lg transition border cursor-pointer whitespace-nowrap bg-pink-600/30 text-pink-300 border-pink-500/50 shadow-sm ring-1 ring-pink-500/40">
+                        <button type="button" onclick="setTopicPage(0)" id="topicTab-0" class="topic-cat-tab px-2.5 py-1 rounded-lg transition border cursor-pointer whitespace-nowrap bg-amber-500 text-black border-amber-400 shadow-md shadow-amber-500/20 font-bold">
                             🌴 Vice City & Heists (GTA-VI)
                         </button>
                         <button type="button" onclick="setTopicPage(1)" id="topicTab-1" class="topic-cat-tab px-2.5 py-1 rounded-lg transition border cursor-pointer whitespace-nowrap bg-black/40 text-gray-400 border-white/10 hover:text-white">
@@ -1893,24 +1971,24 @@ async function adminImportBackup() {
                     </div>
 
                     <!-- Selected Preset Status Strip -->
-                    <div id="selectedPresetBanner" class="hidden mt-2 p-2.5 rounded-xl bg-pink-950/50 border border-pink-500/50 flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <span class="text-pink-300 font-mono flex items-center gap-1.5">
+                    <div id="selectedPresetBanner" class="hidden mt-2 p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span class="text-amber-200 font-mono flex items-center gap-1.5">
                             <span>🎯</span> Selected Scenario: <b id="selectedPresetName" class="text-white">Vice City Sunset</b>
                         </span>
-                        <button type="button" onclick="runGlobalEngine()" class="px-3 py-1 rounded-lg bg-gradient-to-r from-pink-500 to-cyan-400 hover:from-pink-400 hover:to-cyan-300 text-black font-black text-xs transition shadow-md shadow-pink-500/30 flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                        <button type="button" onclick="runGlobalEngine()" class="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-extrabold text-xs transition shadow-md shadow-amber-500/20 flex items-center gap-1.5 active:scale-95 cursor-pointer">
                             <span>⚡</span> Generate This Scenario Instantly
                         </button>
                     </div>
                 </div>
 
                 <!-- Story / Scene Topic Input -->
-                <div>
+                <div class="viewfinder-card">
                     <label class="block text-sm font-bold text-gray-200 mb-1.5 flex items-center justify-between">
-                        <span>Story Concept / Scene Narrative <span class="text-pink-500">*</span></span>
+                        <span class="flex items-center gap-1.5">Story Concept / Scene Narrative <span class="text-amber-400">*</span></span>
                         <span class="text-[11px] text-gray-400">Describe any cinematic vision</span>
                     </label>
                     <textarea id="topicInput" rows="4" 
-                        class="w-full bg-black/60 border border-gta-border rounded-xl p-3 text-sm text-white gta-border-glow focus:outline-none transition placeholder-gray-600 leading-relaxed"
+                        class="w-full director-input rounded-2xl p-3 text-sm text-white placeholder-slate-500 leading-relaxed shadow-inner"
                         placeholder="e.g. Outside a neon Vice City nightclub, two masked operatives in a custom violet hypercar drift through rain-slicked boulevards, pursued by tactical police interceptors and aerial searchlight choppers..."></textarea>
                 </div>
 
@@ -1918,10 +1996,9 @@ async function adminImportBackup() {
                 <div class="grid grid-cols-2 gap-3 text-xs">
                     <div>
                         <label class="block font-semibold text-gray-400 mb-1">Script Language</label>
-                        <select id="langSelect" class="w-full bg-black/60 border border-gta-border rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-pink-500">
+                        <select id="langSelect" class="w-full director-input rounded-xl p-2.5 text-xs text-white">
                             <option value="English" selected>English (Director Cut)</option>
                             <option value="Urdu">Urdu</option>
-                            
                             <option value="Hindi">हिंदी (Hindi)</option>
                             <option value="Arabic">Arabic</option>
                         </select>
@@ -1929,7 +2006,7 @@ async function adminImportBackup() {
 
                     <div>
                         <label class="block font-semibold text-gray-400 mb-1">Scene & Shot Timeline Duration</label>
-                        <select id="durationSelect" class="w-full bg-black/60 border border-gta-border rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-pink-500">
+                        <select id="durationSelect" class="w-full director-input rounded-xl p-2.5 text-xs text-white">
                             <option value="5">5 Shots (5 Scenes • 50s Reels/Shorts)</option>
                             <option value="10">10 Shots (10 Scenes • 1.5 Min Featurette)</option>
                             <option value="20">20 Shots (20 Scenes • 3 Min Cinematic)</option>
@@ -1942,7 +2019,7 @@ async function adminImportBackup() {
 
                     <div>
                         <label class="block font-semibold text-gray-400 mb-1">Visual Render & Physics Engine</label>
-                        <select id="visualStyleSelect" class="w-full bg-black/60 border border-gta-border rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-pink-500">
+                        <select id="visualStyleSelect" class="w-full director-input rounded-xl p-2.5 text-xs text-white">
                             <option value="GTA-VI Photorealistic RAGE Engine 8K" selected>GTA-VI Photorealistic RAGE Engine 8K</option>
                             <option value="Unreal Engine 5.4 Lumen Raytracing">Unreal Engine 5.4 Lumen & Nanite</option>
                             <option value="High-End 3D Pixar Cinematic">High-End 3D Pixar Animation</option>
@@ -1952,7 +2029,7 @@ async function adminImportBackup() {
 
                     <div>
                         <label class="block font-semibold text-gray-400 mb-1">Cinematography & Camera Rig</label>
-                        <select id="cameraStyleSelect" class="w-full bg-black/60 border border-gta-border rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-pink-500">
+                        <select id="cameraStyleSelect" class="w-full director-input rounded-xl p-2.5 text-xs text-white">
                             <option value="Rockstar Over-the-Shoulder & Drone Chase" selected>Rockstar 3rd Person Over-the-Shoulder & Drone</option>
                             <option value="High-Octane Dynamic Action Cam">High-Octane Dynamic Action Cam</option>
                             <option value="Cinematic Movie Drone Overhead">Cinematic FPV Aerial Drone</option>
@@ -1961,30 +2038,31 @@ async function adminImportBackup() {
                             <option value="Cinematic 3rd Person Steady Cam">Cinematic 3rd Person Steady Cam</option>
                         </select>
                     </div>
+                </div>
 
                 <!-- AI Engine Cloud Security & Subscription Status -->
-                <div class="border-t border-gta-border pt-3 space-y-2">
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-emerald-950/60 to-cyan-950/40 border border-emerald-500/40">
+                <div class="border-t border-white/10 pt-3 space-y-2">
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-black/60 border border-white/10">
                         <div class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                             <div>
-                                <span class="text-xs font-bold text-emerald-300 block">
+                                <span class="text-xs font-semibold text-slate-200 block">
                                     🔒 Groq AI Ultra LPU Studio Engine (Zero-Exposure Proxy)
                                 </span>
                                 <span class="text-[10px] text-gray-400">All narrative arcs & visual prompts rendered on secure cloud proxy</span>
                             </div>
                         </div>
-                        <span id="workspaceStatusBadge" class="text-[10px] bg-emerald-900/80 text-emerald-200 border border-emerald-500/30 px-2 py-0.5 rounded font-mono font-bold">
+                        <span id="workspaceStatusBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-lg font-mono font-bold">
                             ONLINE
                         </span>
                     </div>
 
-                    <div id="subscriptionAlertBanner" class="p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 flex items-center justify-between text-xs">
+                    <div id="subscriptionAlertBanner" class="p-2.5 rounded-xl bg-black/60 border border-white/10 flex items-center justify-between text-xs">
                         <div class="flex items-center gap-2">
                             <span id="subBannerIcon">⚡</span>
                             <span id="subBannerText" class="text-gray-300">Access Tier: <b class="text-white">Authentication Required</b></span>
                         </div>
-                        <button onclick="handleAccessButtonClick()" id="subBannerBtn" class="px-2.5 py-1 rounded bg-pink-600/30 hover:bg-pink-600/50 border border-pink-500/40 text-pink-300 text-[10px] font-bold transition">
+                        <button onclick="handleAccessButtonClick()" id="subBannerBtn" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-bold transition">
                             SIGN IN
                         </button>
                     </div>
@@ -1992,8 +2070,8 @@ async function adminImportBackup() {
 
                 <!-- Generate Story & Prompts Button -->
                 <button type="button" onclick="runGlobalEngine()" id="engineRunBtn" 
-                    class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white font-black text-sm tracking-wider uppercase transition transform active:scale-95 shadow-xl shadow-pink-600/20 flex items-center justify-center gap-2">
-                    <span id="btnIcon">⚡</span>
+                    class="w-full py-4 px-6 rounded-2xl director-cta-btn text-black font-black text-sm tracking-wider uppercase transition shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+                    <span id="btnIcon" class="text-lg">⚡</span>
                     <span id="btnLabel">GENERATE FULL CINEMATIC SUITE (DIRECTOR ENGINE)</span>
                 </button>
 
@@ -2004,43 +2082,43 @@ async function adminImportBackup() {
         <section class="lg:col-span-7 flex flex-col space-y-6">
             
             <!-- Output Tabs & Actions Header -->
-            <div class="glass-panel p-3.5 rounded-2xl border border-gta-border flex flex-wrap items-center justify-between gap-3">
+            <div class="glass-panel p-3.5 rounded-3xl border border-white/10 flex flex-wrap items-center justify-between gap-3 shadow-xl">
                 <div class="flex items-center gap-2">
-                    <button onclick="setTab('all')" id="tab-all" class="tab-btn px-3.5 py-1.5 rounded-lg bg-pink-500/20 text-pink-400 border border-pink-500/40 text-xs font-bold transition">
+                    <button onclick="setTab('all')" id="tab-all" class="tab-btn px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-bold transition shadow-sm cursor-pointer">
                         📋 Master Production Script & Prompts
                     </button>
-                    <button onclick="setTab('dna')" id="tab-dna" class="tab-btn px-3.5 py-1.5 rounded-lg bg-transparent text-gray-400 hover:text-white text-xs font-medium transition">
+                    <button onclick="setTab('dna')" id="tab-dna" class="tab-btn px-3.5 py-1.5 rounded-xl bg-transparent text-gray-400 hover:text-white text-xs font-medium transition cursor-pointer">
                         👥 Locked Character DNA Cards
                     </button>
-                    <button onclick="setTab('prompts_board')" id="tab-prompts_board" class="tab-btn px-3.5 py-1.5 rounded-lg bg-transparent text-gray-400 hover:text-white text-xs font-medium transition flex items-center gap-1">
-                        <span>🚀</span> Rapid Prompt Clipboard (Kling / Midjourney)
+                    <button onclick="setTab('prompts_board')" id="tab-prompts_board" class="tab-btn px-3.5 py-1.5 rounded-xl bg-transparent text-gray-400 hover:text-white text-xs font-medium transition flex items-center gap-1 cursor-pointer">
+                        <span>🚀</span> Rapid Prompt Clipboard
                     </button>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button onclick="copyAllVideoPrompts()" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-xs text-cyan-300 border border-cyan-500/40 font-bold transition flex items-center gap-1" title="Copy all motion video prompts for Kling 1.5, Runway Gen-3, Luma Ray 2, Sora">
+                    <button onclick="copyAllVideoPrompts()" class="px-3 py-1.5 rounded-xl bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/40 text-xs text-cyan-300 font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer" title="Copy all motion video prompts for Kling 1.5, Runway Gen-3, Luma Ray 2, Sora">
                         <span>📋</span> Copy All Video Prompts
                     </button>
-                    <button onclick="copyAllMidjourneyPrompts()" class="px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-xs text-purple-300 border border-purple-500/40 font-bold transition flex items-center gap-1" title="Copy all photorealistic image prompts for Midjourney v6.1 & FLUX.1">
+                    <button onclick="copyAllMidjourneyPrompts()" class="px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900 border border-amber-500/40 text-xs text-amber-300 font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer" title="Copy all photorealistic image prompts for Midjourney v6.1 & FLUX.1">
                         <span>🎨</span> Copy All Midjourney Prompts
                     </button>
-                    <button onclick="downloadScriptFile()" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-200 border border-white/10 transition">
+                    <button onclick="downloadScriptFile()" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-gray-200 border border-white/10 transition active:scale-95 cursor-pointer">
                         💾 Export Script (.txt)
                     </button>
                 </div>
             </div>
 
             <!-- Display Area -->
-            <div id="outputDisplay" class="glass-panel p-6 rounded-2xl border border-gta-border flex-1 min-h-[550px] relative overflow-y-auto">
+            <div id="outputDisplay" class="glass-panel p-6 rounded-3xl border border-white/10 flex-1 min-h-[550px] relative overflow-y-auto shadow-2xl">
                 
                 <!-- Initial Empty State -->
                 <div id="emptyView" class="py-16 flex flex-col items-center justify-center text-center">
-                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-600/20 to-cyan-500/20 border border-pink-500/30 flex items-center justify-center text-4xl mb-4 shadow-inner">
-                        🏎️
+                    <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-amber-700/20 border border-amber-500/40 flex items-center justify-center text-4xl mb-4 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+                        🎬
                     </div>
-                    <h3 class="text-xl font-extrabold text-white mb-2">GTA-VI & Cinematic Video Engine Ready</h3>
+                    <h3 class="text-xl font-extrabold text-white mb-2 studio-heading">Virtual Production & 8K Director Engine Ready</h3>
                     <p class="text-xs text-gray-400 max-w-md leading-relaxed">
-                        Select one of the 24 Hollywood-grade presets or formulate your custom story concept, then click <b>GENERATE FULL CINEMATIC SUITE</b>.
+                        Select one of the 24 Hollywood-grade presets or formulate your custom story concept, then click <b class="text-amber-300">GENERATE FULL CINEMATIC SUITE</b>.
                     </p>
                 </div>
 
@@ -2103,9 +2181,9 @@ async function adminImportBackup() {
                         title: "Vice City Ocean Drive",
                         desc: "Neon palm silhouettes, coastal highway & custom muscle cruise",
                         icon: "🌴",
-                        bgClass: "bg-pink-950/30 hover:bg-pink-900/50 border-pink-500/30",
-                        textClass: "text-pink-300",
-                        badgeClass: "text-pink-400",
+                        bgClass: "bg-blue-950/30 hover:bg-blue-900/50 border-blue-500/30",
+                        textClass: "text-blue-300",
+                        badgeClass: "text-blue-400",
                         topic: "Ocean Drive, Vice City at sunset. Two lead operatives cruise along the coastline in a custom violet muscle car under a vivid pink and amber twilight sky, neon lights humming against towering palms with ambient synthwave atmosphere.",
                         visualStyle: "GTA-VI Photorealistic RAGE Engine 8K",
                         camera: "Rockstar Over-the-Shoulder & Drone Chase"
@@ -2151,9 +2229,9 @@ async function adminImportBackup() {
                         title: "Malibu Club Rooftop",
                         desc: "VIP club shootout & high-rise rooftop chopper extraction",
                         icon: "🌃",
-                        bgClass: "bg-purple-950/30 hover:bg-purple-900/50 border-purple-500/30",
-                        textClass: "text-purple-300",
-                        badgeClass: "text-purple-400",
+                        bgClass: "bg-indigo-950/30 hover:bg-indigo-900/50 border-indigo-500/30",
+                        textClass: "text-indigo-300",
+                        badgeClass: "text-indigo-400",
                         topic: "Sudden syndicate ambush inside the neon-drenched Malibu Nightclub. Gunfire erupts across the VIP mezzanine amidst pounding bass and pulsing strobes, followed by a breathless sprint to the emergency elevator for an aerial chopper exfiltration in driving rain.",
                         visualStyle: "Cyberpunk 2077 Night City 8K",
                         camera: "High-Octane Dynamic Action Cam"
@@ -2289,9 +2367,9 @@ async function adminImportBackup() {
                         title: "Neon Vice Cyber Supercar Run",
                         desc: "Bulletproof hypercar sprint through darknet mercenary ambush",
                         icon: "🏁",
-                        bgClass: "bg-pink-950/30 hover:bg-pink-900/50 border-pink-500/30",
-                        textClass: "text-pink-300",
-                        badgeClass: "text-pink-400",
+                        bgClass: "bg-indigo-950/30 hover:bg-indigo-900/50 border-indigo-500/30",
+                        textClass: "text-indigo-300",
+                        badgeClass: "text-indigo-400",
                         topic: "High-speed cyber hypercar sprint down neon-lit coastal highways carrying an encrypted quantum hard drive, fending off high-tech darknet bounty hunter super-bikes at 200mph with countermeasure smoke and EMP bursts.",
                         visualStyle: "GTA-VI Photorealistic RAGE Engine 8K",
                         camera: "Rockstar Over-the-Shoulder & Drone Chase"
@@ -2439,9 +2517,9 @@ async function adminImportBackup() {
                 const tabBtn = document.getElementById('topicTab-' + i);
                 if (tabBtn) {
                     if (i === currentTopicPageIndex) {
-                        tabBtn.className = "topic-cat-tab px-2.5 py-1 rounded-lg transition border cursor-pointer whitespace-nowrap bg-pink-600/30 text-pink-300 border-pink-500/50 shadow-sm ring-1 ring-pink-500/40 font-bold";
+                        tabBtn.className = "topic-cat-tab px-3 py-1.5 rounded-xl transition border cursor-pointer whitespace-nowrap bg-amber-500 text-black border-amber-400 shadow-lg shadow-amber-500/25 font-black";
                     } else {
-                        tabBtn.className = "topic-cat-tab px-2.5 py-1 rounded-lg transition border cursor-pointer whitespace-nowrap bg-black/40 text-gray-400 border-white/10 hover:text-white font-medium";
+                        tabBtn.className = "topic-cat-tab px-3 py-1.5 rounded-xl transition border cursor-pointer whitespace-nowrap bg-black/50 text-slate-400 border-white/10 hover:text-amber-200 hover:bg-white/5 font-semibold";
                     }
                 }
             }
@@ -2483,14 +2561,14 @@ async function adminImportBackup() {
 
             // Highlight selected card visually
             document.querySelectorAll('.preset-card').forEach(c => {
-                c.classList.remove('ring-2', 'ring-cyan-400', 'ring-pink-500', 'bg-cyan-900/60', 'bg-pink-900/60', 'border-cyan-400', 'border-pink-500');
+                c.classList.remove('ring-2', 'ring-blue-500', 'ring-cyan-400', 'bg-blue-950/50', 'bg-cyan-900/60', 'border-blue-500');
                 const badge = c.querySelector('.preset-badge');
                 if (badge) badge.innerText = 'SELECT ›';
             });
 
             const activeBtn = document.getElementById('preset-' + key);
             if (activeBtn) {
-                activeBtn.classList.add('ring-2', 'ring-cyan-400', 'bg-cyan-900/60', 'border-cyan-400');
+                activeBtn.classList.add('ring-2', 'ring-blue-500', 'bg-blue-950/50', 'border-blue-500');
                 const badge = activeBtn.querySelector('.preset-badge');
                 if (badge) badge.innerHTML = '✓ SELECTED';
             }
@@ -2546,22 +2624,31 @@ async function adminImportBackup() {
         }
 
         // ============================================================
-        // DYNAMIC CHARACTER GENERATION ENGINE (Locked DNA & Wardrobe)
+        // DYNAMIC TOPIC SEMANTIC ANALYZER & WORLD BUILDER
         // ============================================================
-        function getDynamicCharactersForTopic(topic) {
+        function analyzeTopicAndBuildWorld(topic, style = 'Cinematic 8K Master', sceneCount = 60, camera = 'Cinematic 35mm Anamorphic') {
             const t = (topic || '').toLowerCase();
+            const count = Math.min(120, Math.max(3, parseInt(sceneCount, 10) || 60));
 
-            if (t.includes('mughal') || t.includes('history') || t.includes('king') || t.includes('fort') || t.includes('sword') || t.includes('historical') || t.includes('warrior') || t.includes('ottoman') || t.includes('sultan')) {
-                return [
+            let genre = 'Cinematic Thriller & Narrative Mission';
+            let envName = 'Atmospheric perimeter with architectural glass and high-rise skyline view';
+            let envDetails = 'cinematic sunset golden hour, dramatic shadows, anamorphic lens flares, 8K ultra-detailed environment';
+            let characters = [];
+
+            if (t.includes('mughal') || t.includes('history') || t.includes('king') || t.includes('fort') || t.includes('sword') || t.includes('historical') || t.includes('warrior') || t.includes('ottoman') || t.includes('sultan') || t.includes('emperor') || t.includes('lahore')) {
+                genre = 'Historical Imperial Epic & Royal Warrior Chronicle';
+                envName = 'Grand royal fortress courtyard and ornate red sandstone battlements';
+                envDetails = 'flickering brass torchlight, royal Persian carpets, intricately carved marble archways, dusty golden sunlight, architectural symmetry';
+                characters = [
                     {
                         name: "Hamza Khan (Royal Commander)",
                         role: "Royal Commander & Vanguard Swordsman",
                         age: "34 Years",
                         gender: "Male",
                         body: "Muscular athletic warrior physique, 6'0\", weathered bronze complexion, hardened jawline and keen eagle gaze",
-                        facialFeatures: "Groomed black beard, sharp aquiline nose, deep brown eyes, faint tactical duel scar on brow",
+                        facialFeatures: "Groomed dark beard, sharp aquiline nose, deep brown eyes, faint tactical duel scar on brow",
                         clothing: "Deep navy blue and olive silk royal angarkha, Damascus steel chest armor with gold filigree, ornate dagger sash, and brown leather boots",
-                        dnaLockToken: "[LOCKED_DNA_HAMZA: 34yo warrior, olive/navy silk angarkha, Damascus steel chest armor, trimmed dark beard, eagle eyes, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_HAMZA: 34yo warrior, olive/navy silk angarkha, Damascus steel chest armor, trimmed dark beard, eagle eyes, zero morphing, strictly locked wardrobe]"
                     },
                     {
                         name: "Zoya Bano (Royal Strategist)",
@@ -2571,11 +2658,62 @@ async function adminImportBackup() {
                         body: "Agile athletic build, 5'7\", honey-olive complexion, commanding regal composure",
                         facialFeatures: "Long flowing dark silk hair, sharp striking eyes, delicate silk veil, and focused determined expression",
                         clothing: "Embroidered crimson and gold silk tunic, leather back quiver, gold woven sash, and velvet riding boots",
-                        dnaLockToken: "[LOCKED_DNA_ZOYA: 28yo female, crimson embroidered silk attire, royal archer quiver, sharp amber eyes, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_ZOYA: 28yo female, crimson embroidered silk attire, royal archer quiver, sharp amber eyes, zero morphing, strictly locked wardrobe]"
                     }
                 ];
-            } else if (t.includes('cyber') || t.includes('sci-fi') || t.includes('future') || t.includes('robot') || t.includes('neon') || t.includes('matrix')) {
-                return [
+            } else if (t.includes('samurai') || t.includes('ninja') || t.includes('katana') || t.includes('japan') || t.includes('ronin') || t.includes('shogun')) {
+                genre = 'Feudal Japanese Masterpiece & Samurai Chronicle';
+                envName = 'Ancient mist-veiled bamboo forest grove and weathered wooden Shinto temple shrine';
+                envDetails = 'swirling bamboo leaves, distant mountain fog, rain drops hitting stone lanterns, soft diffused lantern glow';
+                characters = [
+                    {
+                        name: "Kenji Takahashi (Master Ronin)",
+                        role: "Master Swordsman & Lone Wanderer",
+                        age: "36 Years",
+                        gender: "Male",
+                        body: "Lean powerful martial build, 5'11\", battle-hardened posture, calm calculating focus",
+                        facialFeatures: "Tied black topknot hair, rugged stubble, sharp dark eyes, weathered cheekbones",
+                        clothing: "Midnight indigo dyed cotton hakama, hardened lacquered black iron sode armor, wrapped katana sheath sash, waraji sandals",
+                        dnaLockToken: "[LOCKED_DNA_KENJI: 36yo male, tied topknot, indigo hakama, lacquered black shoulder armor, dual katanas, zero morphing, strictly locked wardrobe]"
+                    }
+                ];
+            } else if (t.includes('space') || t.includes('galaxy') || t.includes('planet') || t.includes('astronaut') || t.includes('alien') || t.includes('spaceship') || t.includes('mars') || t.includes('orbit') || t.includes('cosmic') || t.includes('star')) {
+                genre = 'Deep Space Odyssey & Interstellar Expedition';
+                envName = 'Hostile extraterrestrial canyon with towering crystalline mineral spires';
+                envDetails = 'bioluminescent violet soil, swirling crimson atmospheric dust, twin orbital moons on the horizon, high-contrast stellar illumination';
+                characters = [
+                    {
+                        name: "Commander Leo Vance (Expedition Lead)",
+                        role: "Deep Space Commander & Astrobiologist",
+                        age: "38 Years",
+                        gender: "Male",
+                        body: "Athletic astronaut physique, 6'1\", poised composed stance",
+                        facialFeatures: "Close-cropped brown hair, focused slate blue eyes, clean-shaven chiseled jaw",
+                        clothing: "Reinforced matte white EVA pressure suit with polarized gold-reflective visor, magnetic utility boots, integrated oxygen harness, carbon-fiber wrist display",
+                        dnaLockToken: "[LOCKED_DNA_LEO: 38yo male, matte white EVA suit, polarized gold visor, carbon wrist display, blue eyes, zero morphing, strictly locked wardrobe]"
+                    }
+                ];
+            } else if (t.includes('ocean') || t.includes('submarine') || t.includes('underwater') || t.includes('trench') || t.includes('marine') || t.includes('diver') || t.includes('abyss')) {
+                genre = 'Abyssal Deep-Sea Exploration & Underwater Standoff';
+                envName = 'Submerged oceanic research facility exterior beside a hydrothermal abyssal chasm';
+                envDetails = 'bioluminescent deep-sea fauna, murky cobalt ocean currents, high-intensity yellow underwater floodlights, floating micro-particles';
+                characters = [
+                    {
+                        name: "Captain Drake Larson (Deep-Sea Specialist)",
+                        role: "Atmospheric Diver & Submersible Commander",
+                        age: "40 Years",
+                        gender: "Male",
+                        body: "Broad rugged build, 6'0\", sturdy posture adapted to oceanic depths",
+                        facialFeatures: "Salt-and-pepper short hair, rugged weathered face, keen blue eyes",
+                        clothing: "Heavy atmospheric diving suit in matte slate grey with high-intensity chest floodlights, titanium pressure joints, rebreather unit, magnetic diver boots",
+                        dnaLockToken: "[LOCKED_DNA_DRAKE: 40yo male, slate grey atmospheric diving suit, titanium joints, chest floodlights, blue eyes, zero morphing, strictly locked wardrobe]"
+                    }
+                ];
+            } else if (t.includes('cyber') || t.includes('sci-fi') || t.includes('future') || t.includes('robot') || t.includes('neon') || t.includes('matrix') || t.includes('android')) {
+                genre = 'Cyberpunk High-Tech Syndicate';
+                envName = 'Rain-drenched Neo-Tokyo megacity alleyways and holographic corporate spire';
+                envDetails = 'vivid magenta and cyan neon tube reflections, puddles on dark asphalt, towering volumetric holographic billboards';
+                characters = [
                     {
                         name: "Riven 'Ghost' Cross",
                         role: "Cyber Tech Infiltrator & Combat Operative",
@@ -2584,7 +2722,7 @@ async function adminImportBackup() {
                         body: "Lean athletic build, 5'11\", warm golden skin tone, rapid tactical reflexes",
                         facialFeatures: "Short silver undercut hair, glowing cyan ocular implant on right temple, slate grey eyes, angular jaw",
                         clothing: "Matte black neoprene tactical coat with electroluminescent violet piping, high-tech modular harness, waterproof combat boots",
-                        dnaLockToken: "[LOCKED_DNA_RIVEN: 28yo male, silver undercut hair, matte black tactical jacket with violet piping, blue temple optic, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_RIVEN: 28yo male, silver undercut hair, matte black tactical jacket with violet piping, blue temple optic, zero morphing, strictly locked wardrobe]"
                     },
                     {
                         name: "Aria Vance",
@@ -2594,11 +2732,14 @@ async function adminImportBackup() {
                         body: "Agile slender build, 5'7\", alert stance, striking cobalt eyes",
                         facialFeatures: "Jet black asymmetric bob cut, calm intense focus, holographic comms ear-cuff",
                         clothing: "Charcoal reflective tech-fleece hoodie, black cargo joggers, fingerless tactical gloves, modular data drive harness",
-                        dnaLockToken: "[LOCKED_DNA_ARIA: 26yo female, jet black bob, charcoal reflective hoodie, bright blue eyes, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_ARIA: 26yo female, jet black bob, charcoal reflective hoodie, bright blue eyes, zero morphing, strictly locked wardrobe]"
                     }
                 ];
-            } else if (t.includes('crew') || t.includes('gang') || t.includes('bank') || t.includes('heist') || t.includes('robbery') || t.includes('gta')) {
-                return [
+            } else if (t.includes('bank') || t.includes('heist') || t.includes('robbery') || t.includes('vault') || t.includes('gta') || t.includes('police') || t.includes('syndicate') || t.includes('mafia')) {
+                genre = 'High-Stakes Tactical Heist & Pursuit';
+                envName = 'Subterranean reinforced titanium bank vault and marble atrium floor';
+                envDetails = 'gleaming polished white marble, red laser security tripwires, dim green emergency backup lights, alarm strobe pulses';
+                characters = [
                     {
                         name: "Mateo Cruz",
                         role: "Mastermind & Syndicate Lead",
@@ -2606,8 +2747,8 @@ async function adminImportBackup() {
                         gender: "Male",
                         body: "Broad athletic shoulders, commanding posture, 6'0\", deep brown eyes",
                         facialFeatures: "Slicked-back dark hair, neat stubble, composed confident smile, vigilant gaze",
-                        clothing: "Dark charcoal linen suit jacket over black tee, concealed kevlar vest, leather driving gloves, luxury chronograph",
-                        dnaLockToken: "[LOCKED_DNA_MATEO: 35yo male, slicked dark hair, charcoal linen jacket, tactical inner vest, leather driving gloves, zero morphing]"
+                        clothing: "Dark charcoal linen suit jacket over black tee, concealed kevlar vest, leather driving gloves, luxury chronograph, tailored black trousers",
+                        dnaLockToken: "[LOCKED_DNA_MATEO: 35yo male, slicked dark hair, charcoal linen jacket, tactical inner vest, leather driving gloves, zero morphing, strictly locked wardrobe]"
                     },
                     {
                         name: "Lucia Santos",
@@ -2617,24 +2758,46 @@ async function adminImportBackup() {
                         body: "Athletic toned physique, sun-kissed olive complexion, 5'8\"",
                         facialFeatures: "High slick ponytail, high cheekbones, striking hazel eyes with focused resolve",
                         clothing: "Crimson tactical form-fitting windbreaker, black ripstop cargo pants, tactical drop-leg holster, combat boots",
-                        dnaLockToken: "[LOCKED_DNA_LUCIA: 29yo female, high black ponytail, crimson tactical jacket, hazel eyes, tactical holster, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_LUCIA: 29yo female, high black ponytail, crimson tactical jacket, hazel eyes, tactical holster, zero morphing, strictly locked wardrobe]"
                     }
                 ];
-            } else if (t.includes('lone') || t.includes('solo') || t.includes('assassin') || t.includes('hitman') || t.includes('sniper')) {
-                return [
+            } else if (t.includes('military') || t.includes('soldier') || t.includes('war') || t.includes('sniper') || t.includes('commando') || t.includes('army') || t.includes('spec-ops')) {
+                genre = 'Tier-1 Spec-Ops Recon & Tactical Engagement';
+                envName = 'Rugged forward operating combat base and fortified mountain perimeter';
+                envDetails = 'tactical sandbag redoubts, dense dust smoke plumes, dawn morning haze, harsh directional sunlight through razor wire';
+                characters = [
                     {
-                        name: "Marcus 'Ghost' Vance",
-                        role: "Lone Operative & Tactical Infiltrator",
-                        age: "32 Years",
+                        name: "Major Cole 'Reaper' Sterling",
+                        role: "Spec-Ops Vanguard Commander",
+                        age: "35 Years",
                         gender: "Male",
-                        body: "Muscular athletic build, 6'1\", steel grey eyes, chiseled jawline",
-                        facialFeatures: "Military fade cut, faint notch on left eyebrow, stoic calculating gaze",
-                        clothing: "Matte black tactical mock-neck, concealed low-profile chest rig, dark ripstop cargos, assault boots",
-                        dnaLockToken: "[LOCKED_DNA_MARCUS: 32yo male, athletic tactical build, matte black turtleneck, steel grey eyes, zero morphing]"
+                        body: "Tough muscular military frame, 6'2\", intense battle-hardened posture",
+                        facialFeatures: "Crew cut brown hair, tactical shadow stubble, steely grey eyes, scar across right cheek",
+                        clothing: "Multicam tactical combat shirt, modular plate carrier with trauma plates, tactical radio harness, coyote brown ripstop trousers, tactical combat boots",
+                        dnaLockToken: "[LOCKED_DNA_COLE: 35yo male, crew cut, multicam tactical combat shirt, modular plate carrier, grey eyes, zero morphing, strictly locked wardrobe]"
+                    }
+                ];
+            } else if (t.includes('desert') || t.includes('wasteland') || t.includes('apocalypse') || t.includes('zombie') || t.includes('survival') || t.includes('ruins')) {
+                genre = 'Post-Apocalyptic Survival & Wasteland Odyssey';
+                envName = 'Sun-bleached apocalyptic canyon with rusted skyscraper ruins half-buried in sand';
+                envDetails = 'swirling dust devils, heat shimmer distortion, harsh golden sun, abandoned armored convoy chassis';
+                characters = [
+                    {
+                        name: "Jax Kaelen (Wasteland Survivor)",
+                        role: "Scavenger Vanguard & Tactical Marksman",
+                        age: "33 Years",
+                        gender: "Male",
+                        body: "Wiry athletic survivor build, 6'0\", weather-beaten bronze complexion",
+                        facialFeatures: "Disheveled dusty dark hair, protective respirator collar, focused hawk-like brown eyes",
+                        clothing: "Weathered brown leather duster over distressed canvas utility vest, protective respirator half-mask, patched tactical cargo pants, steel-toed combat boots",
+                        dnaLockToken: "[LOCKED_DNA_JAX: 33yo male, brown leather duster, canvas utility vest, respirator collar, brown eyes, zero morphing, strictly locked wardrobe]"
                     }
                 ];
             } else {
-                return [
+                genre = 'Cinematic Thriller & Mission Chronicle';
+                envName = `Atmospheric ${topic.replace(/[^a-zA-Z0-9\s]/g, '').trim()} setting`;
+                envDetails = 'cinematic sunset golden hour, dramatic shadows, volumetric light beams, 8K ultra-detailed architectural textures';
+                characters = [
                     {
                         name: "Zain Malik (Lead Operative)",
                         role: "Lead Field Operative & Tactician",
@@ -2643,7 +2806,7 @@ async function adminImportBackup() {
                         body: "Muscular athletic build, 6'1\", sun-tanned complexion, acute spatial awareness",
                         facialFeatures: "Short textured military crop, groomed shadow stubble, amber-brown eyes",
                         clothing: "Olive drab tactical utility jacket, dark grey henley, concealed holster, dark raw denim, assault boots",
-                        dnaLockToken: "[LOCKED_DNA_ZAIN: 31yo male, military fade hair, olive green tactical field jacket, amber eyes, combat boots, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_ZAIN: 31yo male, military fade hair, olive green tactical field jacket, amber eyes, combat boots, zero morphing, strictly locked wardrobe]"
                     },
                     {
                         name: "Maya Lin (Tactical Coordinator)",
@@ -2653,10 +2816,16 @@ async function adminImportBackup() {
                         body: "Athletic runner physique, 5'8\", alert focus",
                         facialFeatures: "Dark brown angled bob with side bangs, sleek titanium comms earpiece, sharp observant gaze",
                         clothing: "Matte navy cargo bomber, dark technical base layer, tactical utility belt, low-profile tactical sneakers",
-                        dnaLockToken: "[LOCKED_DNA_MAYA: 27yo female, dark brown side-bang hair, navy tactical bomber, smart comms earpiece, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_MAYA: 27yo female, dark brown side-bang hair, navy tactical bomber, smart comms earpiece, zero morphing, strictly locked wardrobe]"
                     }
                 ];
             }
+
+            return { genre, envName, envDetails, characters, count };
+        }
+
+        function getDynamicCharactersForTopic(topic) {
+            return analyzeTopicAndBuildWorld(topic).characters;
         }
 
         // ============================================================
@@ -2673,36 +2842,25 @@ async function adminImportBackup() {
             if (count === 120) count = 12;
             const sceneCount = Math.min(120, Math.max(3, count));
 
-            const characters = getDynamicCharactersForTopic(topic);
+            const world = analyzeTopicAndBuildWorld(topic, style, sceneCount, camera);
+            const characters = world.characters;
             const mainChar = characters[0];
             const secChar = characters.length > 1 ? characters[1] : null;
-            const t = (topic || '').toLowerCase();
-
-            let envName = 'Atmospheric perimeter with architectural glass and high-rise skyline view';
-            let envDetails = 'cinematic sunset golden hour, dramatic shadows, anamorphic lens flares, 8K ultra-detailed environment';
-
-            if (t.includes('mughal') || t.includes('history') || t.includes('king') || t.includes('fort') || t.includes('sword') || t.includes('historical') || t.includes('warrior')) {
-                envName = '16th-century grand Mughal fortress courtyard and ornate red sandstone battlements';
-                envDetails = 'flickering brass torchlight, royal Persian carpets, intricately carved marble archways, dusty golden sunlight';
-            } else if (t.includes('cyber') || t.includes('sci-fi') || t.includes('future') || t.includes('robot') || t.includes('neon')) {
-                envName = 'Rain-drenched Neo-Tokyo megacity alleyways and holographic corporate spire';
-                envDetails = 'vivid magenta and cyan neon tube reflections, puddles on dark asphalt, towering volumetric holographic billboards';
-            } else if (t.includes('bank') || t.includes('heist') || t.includes('robbery') || t.includes('vault') || t.includes('gta')) {
-                envName = 'Subterranean reinforced titanium bank vault and marble atrium floor';
-                envDetails = 'gleaming polished white marble, red laser security tripwires, dim green emergency backup lights, alarm strobe pulses';
-            }
+            const envName = world.envName;
+            const envDetails = world.envDetails;
+            const genre = world.genre;
 
             const cameraMovements = [
-                "Low-angle cinematic tracking push shot at 60fps, 35mm anamorphic lens",
-                "Dynamic over-the-shoulder steadycam orbit moving at rapid pace",
-                "Intense whip-pan tracking hero shot, dramatic Dutch angle with depth-of-field blur",
-                "Slow-motion 120fps dolly zoom revealing tense facial expressions and tactical gear",
-                "Cinematic macro close-up on focused eyes and weapon/gadget handling",
-                "Wide-angle cinematic crane jib pull-back shot with golden volumetric rays",
-                "Visceral handheld POV camera with realistic micro-shake and motion blur",
-                "High-speed shutter motion tracking pan keeping the operative in razor-sharp focus",
-                "Bird's-eye aerial top-down sweep rotating 360 degrees above the perimeter",
-                "Symmetrical cinematic master shot with volumetric rim flare and anamorphic bokeh"
+                "Low-angle dynamic tracking push at 60fps on 35mm Master Anamorphic T1.3, smooth cinematic motion blur",
+                "Over-the-shoulder steadycam orbit around subject, Panavision Ultra Vista 2.39:1, realistic camera drift",
+                "High-velocity whip-pan hero tracker, 50mm anamorphic prime lens, razor-sharp optical center",
+                "Slow-motion 120fps dolly push-in with shallow depth of field, focused subject separation and rim bloom",
+                "Macro anamorphic close-up on focused eye geometry and tactical hardware, cinematic bokeh",
+                "Wide-angle crane jib descent from rooftop elevation, volumetric twilight god rays through haze",
+                "Visceral first-person POV action rig with subtle organic micro-shake, hyper-realistic motion cadence",
+                "High-speed shutter motion tracking pan keeping the operative pinned in optical focus at 24fps",
+                "Aerial 360-degree top-down architectural drone dive through cloud cover, cinematic sweep",
+                "Symmetrical master tableau with volumetric rim lighting, subtle film grain, Kodak Vision3 500T 5219"
             ];
 
             const narrativePhases = [
@@ -2860,9 +3018,13 @@ async function adminImportBackup() {
                         actionText = `${mainChar.name} (${mainChar.dnaLockToken}), wearing ${mainChar.clothing}, ${specificAction} in ${envName}`;
                     }
 
-                    const videoPrompt = `${mainChar.name} in ${mainChar.clothing}, ${actionText}. ${cameraMovement}. ${envDetails}. photorealistic 8K, Unreal Engine 5.4 Lumen, 35mm lens, hyper-detailed`.substring(0, 440);
-                    const midjourneyPrompt = `${mainChar.name} in ${mainChar.clothing}, ${actionText}, ${envName}, ${envDetails}, shot on 35mm anamorphic lens, 8K ultra-detailed --ar 16:9 --style raw --v 6.1`;
-                    const negativePrompt = "blurry, low quality, morphing, deformed hands, extra limbs, distorted face, altered clothes, changed hair, watermark";
+                    const sequenceTag = (i === 0)
+                        ? `Shot 1 / ${sceneCount} (Establishing Inception)`
+                        : `Shot ${sceneNum} / ${sceneCount} (Chronological Continuity: Follows immediately from Shot ${sceneNum - 1})`;
+
+                    const videoPrompt = `[Scene Sequence]: ${sequenceTag} | [Camera Rig]: ${cameraMovement} | [Subject & Locked DNA]: ${mainChar.name} [${mainChar.dnaLockToken}] | [Wardrobe Lock]: Wearing identical ${mainChar.clothing} (STRICTLY IDENTICAL COSTUME - ZERO MORPHING - NO WARDROBE CHANGE) | [Action]: ${specificAction} | [Location & Environment]: ${envName}, ${envDetails} | [Production Render]: Photorealistic 8K, Unreal Engine 5.5 Lumen Nanite Raytracing, 35mm film stock, hyper-detailed, award-winning cinematography`;
+                    const midjourneyPrompt = `Cinematic movie still, Shot ${sceneNum} of ${sceneCount}, ${mainChar.name} [${mainChar.dnaLockToken}], wearing identical ${mainChar.clothing} (locked costume), ${specificAction}, set in ${envName}, ${envDetails}, captured on ARRI Alexa 65 with Panavision Anamorphic 35mm, Kodak Vision3 500T 5219 film stock, volumetric atmospheric lighting, photorealistic 8k, award-winning cinematography --ar 16:9 --style raw --v 6.1 --q 2`;
+                    const negativePrompt = "morphing, shifting clothes, changing wardrobe, different outfit, altered costume, distorted face, changing hair, extra limbs, deformed hands, duplicate subjects, cartoonish, low resolution, bad anatomy, text, watermark";
 
                     return {
                         number: sceneNum,
@@ -3023,12 +3185,12 @@ async function adminImportBackup() {
         function setTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = "tab-btn px-3.5 py-1.5 rounded-lg bg-transparent text-gray-400 hover:text-white text-xs font-medium transition cursor-pointer";
+                btn.className = "tab-btn px-3.5 py-1.5 rounded-xl bg-transparent text-gray-400 hover:text-white text-xs font-medium transition cursor-pointer";
             });
 
             const activeBtn = document.getElementById('tab-' + tab);
             if (activeBtn) {
-                activeBtn.className = "tab-btn px-3.5 py-1.5 rounded-lg bg-pink-500/20 text-pink-400 border border-pink-500/40 text-xs font-bold transition cursor-pointer";
+                activeBtn.className = "tab-btn px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-bold transition shadow-sm cursor-pointer";
             }
 
             const results = document.getElementById('engineResultsView');
@@ -3083,22 +3245,22 @@ async function adminImportBackup() {
             // Character Cards
             let charCardsHtml = '';
             const charColors = [
-                { bg: 'bg-pink-950/40', border: 'border-pink-500/40', text: 'text-pink-400', badge: 'bg-pink-500/20 text-pink-300' },
-                { bg: 'bg-cyan-950/40', border: 'border-cyan-500/40', text: 'text-cyan-400', badge: 'bg-cyan-500/20 text-cyan-300' },
-                { bg: 'bg-purple-950/40', border: 'border-purple-500/40', text: 'text-purple-400', badge: 'bg-purple-500/20 text-purple-300' },
-                { bg: 'bg-amber-950/40', border: 'border-amber-500/40', text: 'text-amber-400', badge: 'bg-amber-500/20 text-amber-300' }
+                { bg: 'bg-black/60', border: 'border-amber-500/40', text: 'text-amber-300', badge: 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold' },
+                { bg: 'bg-black/60', border: 'border-cyan-500/40', text: 'text-cyan-300', badge: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold' },
+                { bg: 'bg-black/60', border: 'border-emerald-500/40', text: 'text-emerald-300', badge: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold' },
+                { bg: 'bg-black/60', border: 'border-yellow-500/40', text: 'text-yellow-300', badge: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 font-bold' }
             ];
 
             d.characters.forEach((char, idx) => {
                 const color = charColors[idx % charColors.length];
                 charCardsHtml += `
-                <div class="${color.bg} p-4 rounded-xl border ${color.border} space-y-2 shadow-lg">
+                <div class="${color.bg} p-4 rounded-2xl border ${color.border} space-y-2 shadow-lg">
                     <div class="flex items-center justify-between border-b border-white/10 pb-2">
                         <div class="flex items-center gap-2">
                             <span class="w-6 h-6 rounded-full ${color.badge} flex items-center justify-center text-xs font-bold font-mono">${idx + 1}</span>
                             <b class="${color.text} text-sm font-bold">${char.name}</b>
                         </div>
-                        <span class="text-[10px] px-2 py-0.5 rounded font-mono ${color.badge}">${char.role}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-lg font-mono ${color.badge}">${char.role}</span>
                     </div>
                     <div class="space-y-1 text-xs text-gray-300">
                         <p><b class="text-white">Age & Build:</b> ${char.age || ''}, ${char.body || ''}</p>
@@ -3106,10 +3268,10 @@ async function adminImportBackup() {
                         <p><b class="text-white">Locked Wardrobe:</b> ${char.clothing || ''}</p>
                     </div>
                     <div class="pt-2 border-t border-white/5 flex items-center justify-between">
-                        <span class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                        <span class="text-[10px] text-emerald-400 font-mono flex items-center gap-1 font-bold">
                             <span>🔒</span> Locked DNA (Zero Morphing)
                         </span>
-                        <button onclick="copyCharacterDna('${char.name.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold transition flex items-center gap-1">
+                        <button onclick="copyCharacterDna('${char.name.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer">
                             <span>📋</span> Copy DNA
                         </button>
                     </div>
@@ -3121,68 +3283,68 @@ async function adminImportBackup() {
             let scenesHtml = '';
             d.scenes.forEach(s => {
                 scenesHtml += `
-                <div class="glass-panel p-5 rounded-2xl border border-gta-border space-y-4 hover:border-pink-500/40 transition shadow-xl">
+                <div class="glass-panel p-5 rounded-3xl border border-white/10 space-y-4 hover:border-amber-500/50 hover:shadow-[0_0_35px_rgba(245,158,11,0.18)] transition-all shadow-xl">
                     <!-- Scene Header -->
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-pink-500 to-cyan-400 text-black font-black flex items-center justify-center text-xs shadow-md">
+                            <span class="w-9 h-9 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-700 text-black font-black flex items-center justify-center text-xs shadow-md shadow-amber-500/25 ring-1 ring-yellow-300/40">
                                 ${s.number}
                             </span>
                             <div>
-                                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                                <h4 class="text-sm font-extrabold text-white flex items-center gap-2">
                                     <span>SCENE ${String(s.number).padStart(2, '0')}: ${s.title}</span>
-                                    <span class="text-[10px] bg-white/10 text-cyan-300 px-2 py-0.5 rounded font-mono font-normal">${s.timestamp}</span>
+                                    <span class="text-[10px] bg-black/70 text-cyan-400 px-2 py-0.5 rounded-lg border border-cyan-500/30 font-mono font-bold">${s.timestamp}</span>
                                 </h4>
                                 <span class="text-[10px] text-gray-400">Characters: ${s.activeCharacters ? s.activeCharacters.join(', ') : 'All'}</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5">
                             <button onclick="copySinglePrompt(${s.number}, 'video')" id="copy-vid-btn-${s.number}" 
-                                class="px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-black text-xs rounded-lg transition flex items-center gap-1 shadow-md shadow-cyan-500/20 active:scale-95">
+                                class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-black text-xs rounded-xl transition flex items-center gap-1 shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer">
                                 <span>📋</span> Copy Video Prompt
                             </button>
                             <button onclick="copySinglePrompt(${s.number}, 'midjourney')" id="copy-mj-btn-${s.number}" 
-                                class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-md shadow-purple-600/20 active:scale-95">
+                                class="px-3 py-1.5 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-bold text-xs rounded-xl transition flex items-center gap-1 active:scale-95 cursor-pointer">
                                 <span>🎨</span> Copy Midjourney
                             </button>
                         </div>
                     </div>
 
                     <!-- Directives Bar -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs bg-black/60 p-3 rounded-xl border border-white/5 text-gray-300">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs bg-black/60 p-3 rounded-2xl border border-white/5 text-slate-300">
                         <div><b class="text-cyan-400">🎥 Camera Rig:</b> ${s.camera}</div>
-                        <div><b class="text-yellow-400">💡 Lighting & Atmosphere:</b> ${s.lighting}</div>
-                        <div><b class="text-pink-400">💬 Dialogue Cue:</b> <span class="text-white font-semibold">"${s.dialogue}"</span></div>
+                        <div><b class="text-amber-400">💡 Lighting & Atmosphere:</b> ${s.lighting}</div>
+                        <div><b class="text-emerald-400">💬 Dialogue Cue:</b> <span class="text-white font-semibold">"${s.dialogue}"</span></div>
                     </div>
 
                     <!-- 1. Universal Video Prompt Box -->
-                    <div class="bg-black/85 rounded-xl p-3.5 border border-cyan-500/30 space-y-2">
+                    <div class="bg-black/70 rounded-2xl p-4 border border-cyan-500/30 space-y-2 shadow-sm">
                         <div class="flex items-center justify-between text-xs">
                             <span class="font-mono text-cyan-300 font-bold flex items-center gap-1.5">
                                 <span>⚡</span> UNIVERSAL AI VIDEO PROMPT (Kling 1.5 • Runway Gen-3 • Luma • Sora • Minimax):
                             </span>
-                            <button onclick="copySinglePrompt(${s.number}, 'video')" class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 hover:bg-cyan-900 border border-cyan-500/40 transition">
+                            <button onclick="copySinglePrompt(${s.number}, 'video')" class="text-[10px] px-2.5 py-0.5 rounded-lg bg-cyan-950 text-cyan-300 hover:bg-cyan-900 border border-cyan-500/40 font-bold transition">
                                 📋 Copy
                             </button>
                         </div>
-                        <p class="text-xs text-gray-100 font-mono select-all leading-relaxed bg-black/60 p-2.5 rounded-lg border border-white/5" id="video-prompt-${s.number}">${s.videoPrompt}</p>
+                        <p class="text-xs text-gray-100 font-mono select-all leading-relaxed bg-black/60 p-3 rounded-xl border border-white/5" id="video-prompt-${s.number}">${s.videoPrompt}</p>
                     </div>
 
                     <!-- 2. Midjourney v6.1 Keyframe Prompt Box -->
-                    <div class="bg-black/85 rounded-xl p-3.5 border border-purple-500/30 space-y-2">
+                    <div class="bg-black/70 rounded-2xl p-4 border border-amber-500/30 space-y-2 shadow-sm">
                         <div class="flex items-center justify-between text-xs">
-                            <span class="font-mono text-purple-300 font-bold flex items-center gap-1.5">
+                            <span class="font-mono text-amber-300 font-bold flex items-center gap-1.5">
                                 <span>🎨</span> MIDJOURNEY v6.1 KEYFRAME PROMPT:
                             </span>
-                            <button onclick="copySinglePrompt(${s.number}, 'midjourney')" class="text-[10px] px-2 py-0.5 rounded bg-purple-950 text-purple-300 hover:bg-purple-900 border border-purple-500/40 transition">
+                            <button onclick="copySinglePrompt(${s.number}, 'midjourney')" class="text-[10px] px-2.5 py-0.5 rounded-lg bg-amber-950 text-amber-300 hover:bg-amber-900 border border-amber-500/40 font-bold transition">
                                 🎨 Copy
                             </button>
                         </div>
-                        <p class="text-xs text-gray-300 font-mono select-all leading-relaxed bg-black/60 p-2.5 rounded-lg border border-white/5" id="mj-prompt-${s.number}">${s.midjourneyPrompt}</p>
+                        <p class="text-xs text-gray-300 font-mono select-all leading-relaxed bg-black/60 p-3 rounded-xl border border-white/5" id="mj-prompt-${s.number}">${s.midjourneyPrompt}</p>
                     </div>
 
                     <!-- 3. Negative Prompt -->
-                    <div class="bg-black/50 p-2.5 rounded-lg border border-white/5 flex items-center justify-between text-[11px] font-mono text-gray-400">
+                    <div class="bg-black/50 p-2.5 rounded-xl border border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
                         <div class="truncate mr-2">
                             <b class="text-red-400">Negative Prompt:</b> <span id="neg-prompt-${s.number}">${s.negativePrompt}</span>
                         </div>
@@ -3196,12 +3358,12 @@ async function adminImportBackup() {
 
             container.innerHTML = `
                 <!-- Header Summary Strip -->
-                <div class="glass-panel p-5 rounded-2xl border border-pink-500/40 glow-pink space-y-4">
+                <div class="glass-panel p-5 rounded-3xl border border-amber-500/30 shadow-xl shadow-amber-500/5 space-y-4">
                     <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-3 gap-2">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-pink-500/20 text-pink-400 border border-pink-500/30">MASTER PROMPT STUDIO</span>
-                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">👥 ${d.characters.length} Dynamic Characters</span>
-                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">🎬 ${d.sceneCount} Full Cinematic Shots (${Math.max(1, Math.round(d.sceneCount * 10 / 60))} Min Timeline)</span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30">MASTER PROMPT STUDIO</span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">👥 ${d.characters.length} Dynamic Characters</span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">🎬 ${d.sceneCount} Full Cinematic Shots (${Math.max(1, Math.round(d.sceneCount * 10 / 60))} Min Timeline)</span>
                         </div>
                         <h3 class="text-sm font-bold text-white max-w-md truncate">${d.topic}</h3>
                     </div>
@@ -3209,7 +3371,7 @@ async function adminImportBackup() {
                     <!-- Dynamic Characters DNA Grid -->
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-pink-400 flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5 studio-heading">
                                 <span>👥</span> Locked Character DNA & Visual Identifiers:
                             </span>
                             <span class="text-[11px] text-gray-400">Dynamically generated & DNA-locked characters</span>
@@ -3254,21 +3416,21 @@ async function adminImportBackup() {
             let cards = '';
             d.characters.forEach((char, idx) => {
                 cards += `
-                <div class="glass-panel p-6 rounded-2xl border border-cyan-500/40 space-y-4 shadow-2xl">
+                <div class="glass-panel p-6 rounded-3xl border border-white/10 hover:border-amber-500/40 transition-all space-y-4 shadow-2xl">
                     <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-3 gap-2">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-600 to-cyan-500 flex items-center justify-center text-white font-black text-sm shadow-md">
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-700 flex items-center justify-center text-black font-black text-sm shadow-md shadow-amber-500/25 ring-1 ring-yellow-300/40">
                                 0${idx + 1}
                             </div>
                             <div>
-                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <h3 class="text-base font-extrabold text-white flex items-center gap-2">
                                     ${char.name}
                                     <span class="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/30">${char.role}</span>
                                 </h3>
                                 <span class="text-xs text-gray-400">${char.gender || 'Character'}, ${char.age || ''}</span>
                             </div>
                         </div>
-                        <button onclick="copyCharacterDna('${char.name.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-gradient-to-r from-pink-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5 active:scale-95">
+                        <button onclick="copyCharacterDna('${char.name.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-black text-xs rounded-xl shadow-md shadow-amber-500/20 transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
                             <span>📋</span> Copy DNA Lock Token
                         </button>
                     </div>
@@ -3279,7 +3441,7 @@ async function adminImportBackup() {
                             <p>${char.body}</p>
                         </div>
                         <div class="bg-black/60 p-3.5 rounded-xl border border-white/5 space-y-1">
-                            <b class="text-pink-300 block mb-1">💇 Facial Features & Eyes:</b>
+                            <b class="text-indigo-300 block mb-1">💇 Facial Features & Eyes:</b>
                             <p>${char.facialFeatures}</p>
                         </div>
                         <div class="bg-black/60 p-3.5 rounded-xl border border-white/5 space-y-1 md:col-span-2">
@@ -3309,7 +3471,7 @@ async function adminImportBackup() {
                         </h3>
                         <p class="text-xs text-gray-400">All characters dynamically tailored to "${d.topic.substring(0, 40)}..."</p>
                     </div>
-                    <button onclick="copyAllCharacterDna()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-1.5 active:scale-95">
+                    <button onclick="copyAllCharacterDna()" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
                         <span>📋</span> Copy All Character DNA Tokens
                     </button>
                 </div>
@@ -3347,7 +3509,7 @@ ${s.midjourneyPrompt}`
                     </div>
 
                     <!-- Universal Video Prompts Bulk Box -->
-                    <div class="glass-panel p-5 rounded-2xl border border-cyan-500/40 space-y-3 shadow-xl">
+                    <div class="glass-panel p-5 rounded-2xl border border-cyan-500/30 space-y-3 shadow-xl">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
                                 <span>⚡</span> Universal Video Prompts (Kling 1.5 • Runway Gen-3 • Luma Ray 2 • Sora)
@@ -3360,12 +3522,12 @@ ${s.midjourneyPrompt}`
                     </div>
 
                     <!-- Midjourney v6.1 Prompts Bulk Box -->
-                    <div class="glass-panel p-5 rounded-2xl border border-purple-500/40 space-y-3 shadow-xl">
+                    <div class="glass-panel p-5 rounded-2xl border border-indigo-500/30 space-y-3 shadow-xl">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-purple-400 flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
                                 <span>🎨</span> Midjourney v6.1 Keyframe Prompts (High-Resolution Frames)
                             </span>
-                            <button onclick="copyAllMidjourneyPrompts()" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-md shadow-purple-600/20 active:scale-95">
+                            <button onclick="copyAllMidjourneyPrompts()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center gap-1 shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer">
                                 <span>🎨</span> Copy All
                             </button>
                         </div>
@@ -3530,18 +3692,18 @@ ${c.dnaLockToken || c.clothing}`
     <!-- 1. AUTHENTICATION MODAL (Login / Register / Reset)           -->
     <!-- ============================================================ -->
     <div id="authModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-md rounded-2xl border border-pink-500/40 p-6 space-y-5 shadow-2xl relative">
+        <div class="glass-panel w-full max-w-md rounded-2xl border border-slate-700/80 p-6 space-y-5 shadow-2xl relative">
             <button id="authModalCloseBtn" onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold">✕</button>
             
             <div class="text-center space-y-1">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-600 to-cyan-400 flex items-center justify-center text-white font-black mx-auto shadow-lg shadow-pink-500/30">VI</div>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white font-black mx-auto shadow-lg shadow-blue-500/30">VI</div>
                 <h3 class="text-lg font-extrabold text-white">GLOBAL GENERATOR ACCESS</h3>
                 <p class="text-xs text-gray-400">Sign in to your account or create a new director license</p>
             </div>
 
             <!-- Tab Switcher -->
             <div class="flex border-b border-white/10">
-                <button id="authTabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold text-pink-400 border-b-2 border-pink-500">SIGN IN</button>
+                <button id="authTabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold text-blue-400 border-b-2 border-blue-500">SIGN IN</button>
                 <button id="authTabSignupBtn" onclick="switchAuthTab('signup')" class="flex-1 py-2 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent">REGISTER</button>
                 <button id="authTabResetBtn" onclick="switchAuthTab('reset')" class="hidden flex-1 py-2 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent">RESET</button>
             </div>
@@ -3579,11 +3741,11 @@ ${c.dnaLockToken || c.clothing}`
                     <label class="block text-xs font-bold text-gray-300 mb-1">RESET (Password)</label>
                     <input id="loginPassword" type="password" required placeholder="••••••••" class="w-full bg-black/70 border border-gta-border rounded-xl p-2.5 text-xs text-white gta-border-glow focus:outline-none" />
                 </div>
-                <button id="loginSubmitBtn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-extrabold text-xs uppercase tracking-wider transition active:scale-95 shadow-lg shadow-pink-600/30 cursor-pointer">
+                <button id="loginSubmitBtn" type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-lg shadow-amber-500/25 cursor-pointer">
                     SIGN IN TO STUDIO
                 </button>
                 <div class="text-center pt-1">
-                    <button type="button" onclick="switchAuthTab('reset')" class="text-xs text-gray-400 hover:text-cyan-400 transition">Forgot Password? (Reset)</button>
+                    <button type="button" onclick="switchAuthTab('reset')" class="text-xs text-gray-400 hover:text-amber-300 transition">Forgot Password? (Reset)</button>
                 </div>
             </form>
 
@@ -3591,25 +3753,25 @@ ${c.dnaLockToken || c.clothing}`
             <form id="authSignupForm" onsubmit="handleSignupSubmit(event)" class="hidden space-y-3">
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">Full Legal Name</label>
-                    <input id="signupName" type="text" required placeholder="Ali Khan" class="w-full bg-black/70 border border-gta-border rounded-xl p-2.5 text-xs text-white gta-border-glow focus:outline-none" />
+                    <input id="signupName" type="text" required placeholder="Ali Khan" class="w-full bg-black/70 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400" />
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">Email Address</label>
-                    <input id="signupEmail" type="email" required placeholder="ali@example.com" class="w-full bg-black/70 border border-gta-border rounded-xl p-2.5 text-xs text-white gta-border-glow focus:outline-none" />
+                    <input id="signupEmail" type="email" required placeholder="ali@example.com" class="w-full bg-black/70 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400" />
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">Password (Min 6 characters)</label>
-                    <input id="signupPassword" type="password" required minlength="6" placeholder="••••••••" class="w-full bg-black/70 border border-gta-border rounded-xl p-2.5 text-xs text-white gta-border-glow focus:outline-none" />
+                    <input id="signupPassword" type="password" required minlength="6" placeholder="••••••••" class="w-full bg-black/70 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400" />
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">Select Subscription Plan</label>
-                    <select id="signupPlanSelect" class="w-full bg-black/70 border border-gta-border rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                    <select id="signupPlanSelect" class="w-full bg-black/70 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
                         <option value="Monthly">Monthly Plan — PKR 3,000 (30 Days)</option>
                         <option value="6 Months">6 Months Plan — PKR 15,000 (6 Months)</option>
                         <option value="Annual">Annual Plan — PKR 25,000 (1 Year / 365 Days)</option>
                     </select>
                 </div>
-                <button id="signupSubmitBtn" type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white font-extrabold text-xs uppercase tracking-wider transition active:scale-95 shadow-lg cursor-pointer">
+                <button id="signupSubmitBtn" type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-lg shadow-amber-500/25 cursor-pointer">
                     CREATE DIRECTOR ACCOUNT
                 </button>
             </form>
@@ -3619,13 +3781,13 @@ ${c.dnaLockToken || c.clothing}`
                 <div class="text-xs text-gray-300 bg-black/50 p-3 rounded-xl border border-white/5">
                     To reset password, WhatsApp your registered email to administration: 03008998381 (Sufyan Habib)
                 </div>
-                <button type="submit" class="w-full py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-black font-extrabold text-xs transition cursor-pointer">
+                <button type="submit" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition cursor-pointer">
                     Back to Sign In
                 </button>
             </form>
 
             <div class="text-center pt-2 border-t border-white/5">
-                <button type="button" onclick="showServerConnectionModal()" class="text-[11px] text-gray-500 hover:text-cyan-400 transition inline-flex items-center gap-1">
+                <button type="button" onclick="showServerConnectionModal()" class="text-[11px] text-gray-500 hover:text-amber-300 transition inline-flex items-center gap-1">
                     <span>🌐</span> <span>Server Connection URL</span>
                 </button>
             </div>
@@ -3635,79 +3797,93 @@ ${c.dnaLockToken || c.clothing}`
     <!-- ============================================================ -->
     <!-- 2. USER DASHBOARD MODAL                                      -->
     <!-- ============================================================ -->
-    <div id="userDashboardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-lg rounded-2xl border border-pink-500/40 p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeUserDashboardModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold">✕</button>
+    <div id="userDashboardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-amber-500/40 p-7 space-y-6 shadow-[0_0_60px_rgba(245,158,11,0.18)] relative max-h-[92vh] overflow-y-auto viewfinder-card">
+            <button onclick="closeUserDashboardModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center text-sm font-bold transition cursor-pointer">✕</button>
 
-            <div class="border-b border-white/10 pb-4">
-                <span class="text-xs text-pink-400 font-mono font-bold uppercase tracking-widest">USER ACCOUNT & LICENSE</span>
-                <h2 class="text-xl font-black text-white flex items-center gap-2 mt-0.5">
-                    Welcome, <span id="dashUserName" class="gta-gradient-text">User</span>
-                </h2>
-                <p id="dashUserEmail" class="text-xs text-gray-400 font-mono">user@example.com</p>
+            <!-- VIP Director Pass Header -->
+            <div class="flex items-center gap-3.5 border-b border-white/10 pb-5">
+                <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-700 flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-amber-500/30 ring-2 ring-yellow-300/40 flex-shrink-0">
+                    🎬
+                </div>
+                <div class="truncate">
+                    <span class="text-[10px] text-amber-400 font-mono font-bold uppercase tracking-widest block">VIP STUDIO DIRECTOR LICENSE</span>
+                    <h2 class="text-xl font-black text-white flex items-center gap-2 mt-0.5">
+                        <span id="dashUserName" class="gold-gradient-text font-black">User</span>
+                    </h2>
+                    <p id="dashUserEmail" class="text-xs text-gray-400 font-mono truncate">user@example.com</p>
+                </div>
             </div>
 
-            <!-- Subscription Details Card -->
-            <div class="bg-black/70 rounded-2xl p-5 border border-white/10 space-y-4">
+            <!-- Executive Subscription Card -->
+            <div class="bg-gradient-to-b from-black/80 to-slate-950/90 rounded-2xl p-5 border border-amber-500/30 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between border-b border-white/5 pb-3">
                     <div>
-                        <span class="text-[11px] text-gray-400 uppercase font-mono block">Subscription Plan</span>
-                        <h4 id="dashPlanName" class="text-lg font-black text-white">Monthly</h4>
+                        <span class="text-[10px] text-gray-400 uppercase font-mono block">License Tier</span>
+                        <h4 id="dashPlanName" class="text-lg font-black text-white flex items-center gap-1.5">
+                            <span>👑</span> <span>Monthly</span>
+                        </h4>
                     </div>
                     <div class="text-right">
-                        <span class="text-[11px] text-gray-400 uppercase font-mono block">Price</span>
-                        <span id="dashPlanPrice" class="text-lg font-black text-cyan-400">PKR 3,000</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-mono block">Pass Value</span>
+                        <span id="dashPlanPrice" class="text-lg font-black text-cyan-400 font-mono">PKR 3,000</span>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
-                        <span class="text-[10px] text-gray-400 block font-mono">Start Date</span>
-                        <b id="dashStartDate" class="text-white font-mono">-</b>
+                <div class="grid grid-cols-3 gap-2.5 text-center text-xs">
+                    <div class="bg-black/50 p-2.5 rounded-xl border border-white/5">
+                        <span class="text-[9px] text-gray-400 block font-mono uppercase">Start Date</span>
+                        <b id="dashStartDate" class="text-white font-mono text-[11px]">-</b>
                     </div>
-                    <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
-                        <span class="text-[10px] text-gray-400 block font-mono">Expiry Date</span>
-                        <b id="dashExpiryDate" class="text-white font-mono">-</b>
+                    <div class="bg-black/50 p-2.5 rounded-xl border border-white/5">
+                        <span class="text-[9px] text-gray-400 block font-mono uppercase">Expiry Date</span>
+                        <b id="dashExpiryDate" class="text-white font-mono text-[11px]">-</b>
                     </div>
-                    <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
-                        <span class="text-[10px] text-gray-400 block font-mono">Days Remaining</span>
-                        <b id="dashDaysRemaining" class="text-pink-400 font-mono">0 Days</b>
+                    <div class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/40">
+                        <span class="text-[9px] text-amber-300 block font-mono uppercase font-bold">Days Left</span>
+                        <b id="dashDaysRemaining" class="text-amber-400 font-mono font-black text-sm">0 Days</b>
                     </div>
                 </div>
             </div>
 
             <!-- Status Alerts (Strict Urdu Requirements) -->
-            <div id="dashActiveNotice" class="hidden p-4 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-xs text-emerald-200 space-y-1">
-                <b class="text-white block font-bold">✓ Your Studio License is ACTIVE!</b>
-                <p>Full unrestricted access to Global Generator 8K Studio, Locked Character DNA, and Video Prompts.</p>
+            <div id="dashActiveNotice" class="hidden p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/60 text-xs text-emerald-200 space-y-1 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                <b class="text-emerald-300 block font-bold text-sm flex items-center gap-1.5">
+                    <span>✓</span> STUDIO CLEARANCE ACTIVE!
+                </b>
+                <p class="leading-relaxed">Full unrestricted access to Global Generator 8K Virtual Production, Locked Character DNA, and Multi-Scene Director Prompts.</p>
             </div>
 
-            <div id="dashPendingNotice" class="hidden p-4 rounded-xl bg-amber-950/70 border border-amber-500/50 text-xs text-amber-200 space-y-2">
-                <b class="text-amber-300 block text-sm font-bold">⚠️ Your account is pending verification and access approval.</b>
-                <p>If you haven't submitted your payment reference, click Submit Payment below. The administrator will grant access promptly upon verification.</p>
-                <button onclick="closeUserDashboardModal(); openPaymentModal(currentUser?.subscription?.plan || 'Monthly')" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-black font-extrabold text-xs transition cursor-pointer">
-                    Submit Payment
+            <div id="dashPendingNotice" class="hidden p-4 rounded-2xl bg-amber-950/80 border border-amber-500/60 text-xs text-amber-200 space-y-2.5 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                <b class="text-amber-300 block text-sm font-bold flex items-center gap-1.5">
+                    <span>⏳</span> CLEARANCE PENDING MISSION CONTROL APPROVAL
+                </b>
+                <p class="leading-relaxed">Your account has been registered. If you haven't submitted your payment reference, click Submit Payment below. Mission Control will verify and grant instant studio access.</p>
+                <button onclick="closeUserDashboardModal(); openPaymentModal(currentUser?.subscription?.plan || 'Monthly')" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs transition cursor-pointer shadow-md">
+                    Submit Payment Reference
                 </button>
             </div>
 
-            <div id="dashExpiredNotice" class="hidden p-4 rounded-xl bg-red-950/70 border border-red-500/50 text-xs text-red-200 space-y-2">
-                <b class="text-red-300 block text-sm font-bold">❌ Your subscription has EXPIRED.</b>
-                <p>Renew your subscription license to restore instant access to AI video generation.</p>
-                <button onclick="closeUserDashboardModal(); openPricingModal()" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-extrabold text-xs transition cursor-pointer">
-                    Buy Plan
+            <div id="dashExpiredNotice" class="hidden p-4 rounded-2xl bg-red-950/80 border border-red-500/60 text-xs text-red-200 space-y-2.5">
+                <b class="text-red-300 block text-sm font-bold flex items-center gap-1.5">
+                    <span>⚠️</span> STUDIO SUBSCRIPTION EXPIRED
+                </b>
+                <p class="leading-relaxed">Your production license has expired. Renew your pass to restore immediate access to AI cinematic video rendering.</p>
+                <button onclick="closeUserDashboardModal(); openPricingModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs transition cursor-pointer shadow-md">
+                    Renew Subscription Pass
                 </button>
             </div>
 
-            <div id="dashBlockedNotice" class="hidden p-4 rounded-xl bg-red-950/80 border border-red-600 text-xs text-red-200 space-y-1">
-                <b class="text-red-300 block text-sm font-bold">🚫 Access has been revoked by administration.</b>
-                <p>Please contact support or the administrator to reinstate your account.</p>
+            <div id="dashBlockedNotice" class="hidden p-4 rounded-2xl bg-red-950/90 border border-red-600 text-xs text-red-200 space-y-1">
+                <b class="text-red-300 block text-sm font-bold">🚫 ACCESS SUSPENDED BY ADMINISTRATION</b>
+                <p>Please contact Mission Control or Support to reinstate your creator account.</p>
             </div>
 
-            <div id="dashRejectedNotice" class="hidden p-4 rounded-xl bg-red-950/80 border border-red-600 text-xs text-red-200 space-y-2">
-                <b class="text-red-300 block text-sm font-bold">❌ Payment submission was REJECTED.</b>
-                <p>The transaction reference could not be verified by administration. Please re-submit your receipt details or contact support.</p>
-                <button onclick="closeUserDashboardModal(); openPaymentModal(currentUser?.subscription?.plan || 'Monthly')" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-extrabold text-xs transition cursor-pointer">
-                    Submit Payment
+            <div id="dashRejectedNotice" class="hidden p-4 rounded-2xl bg-red-950/90 border border-red-600 text-xs text-red-200 space-y-2.5">
+                <b class="text-red-300 block text-sm font-bold">❌ PAYMENT REFERENCE REJECTED</b>
+                <p class="leading-relaxed">The transaction reference could not be verified by administration. Please re-submit your receipt details or contact support.</p>
+                <button onclick="closeUserDashboardModal(); openPaymentModal(currentUser?.subscription?.plan || 'Monthly')" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs transition cursor-pointer">
+                    Re-Submit Payment
                 </button>
             </div>
 
@@ -3716,13 +3892,13 @@ ${c.dnaLockToken || c.clothing}`
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-bold text-gray-300 uppercase font-mono">Payment History & Status</span>
                     <button type="button" onclick="checkPaymentStatus()" class="px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/40 text-[10px] text-cyan-300 font-bold transition cursor-pointer flex items-center gap-1">
-                        <span>🔄</span> <span>Check Payment Status</span>
+                        <span>🔄</span> <span>Check Status</span>
                     </button>
                 </div>
-                <div class="overflow-x-auto rounded-xl border border-white/10 bg-black/50 max-h-36 overflow-y-auto">
+                <div class="overflow-x-auto rounded-xl border border-white/10 bg-black/60 max-h-36 overflow-y-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-black/80 text-[10px] font-mono text-gray-400 border-b border-white/10">
+                            <tr class="bg-black/90 text-[10px] font-mono text-gray-400 border-b border-white/10">
                                 <th class="p-2">PLAN</th>
                                 <th class="p-2">AMOUNT</th>
                                 <th class="p-2">TRX ID</th>
@@ -3738,18 +3914,18 @@ ${c.dnaLockToken || c.clothing}`
             </div>
 
             <!-- Action Buttons -->
-            <div class="space-y-2 pt-2 border-t border-white/10">
-                <button id="dashOpenGenBtn" onclick="openGeneratorFromDashboard()" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-black font-black text-sm tracking-wider uppercase transition shadow-xl shadow-emerald-500/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2">
-                    <span>⚡</span> <span>OPEN GLOBAL GENERATOR</span>
+            <div class="space-y-2.5 pt-2 border-t border-white/10">
+                <button id="dashOpenGenBtn" onclick="openGeneratorFromDashboard()" class="w-full py-4 px-6 rounded-2xl director-cta-btn text-black font-black text-sm tracking-wider uppercase transition shadow-2xl active:scale-95 cursor-pointer flex items-center justify-center gap-2">
+                    <span>⚡</span> <span>LAUNCH GLOBAL GENERATOR STUDIO</span>
                 </button>
                 <div class="grid grid-cols-3 gap-2">
-                    <button onclick="closeUserDashboardModal(); openPricingModal()" class="py-2.5 px-2 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-bold transition text-center cursor-pointer shadow-md">
+                    <button onclick="closeUserDashboardModal(); openPricingModal()" class="py-2.5 px-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition text-center cursor-pointer shadow-sm active:scale-95">
                         Buy Plan
                     </button>
-                    <button onclick="closeUserDashboardModal(); openPaymentModal(currentUser?.subscription?.plan || 'Monthly')" class="py-2.5 px-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold transition text-center cursor-pointer shadow-md">
+                    <button onclick="closeUserDashboardModal(); openPaymentModal(currentUser?.subscription?.plan || 'Monthly')" class="py-2.5 px-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition text-center cursor-pointer shadow-sm active:scale-95">
                         Submit Payment
                     </button>
-                    <button onclick="closeUserDashboardModal(); handleLogout()" class="py-2.5 px-2 rounded-xl bg-red-950/60 hover:bg-red-900 border border-red-500/40 text-red-300 text-xs font-bold transition text-center cursor-pointer">
+                    <button onclick="closeUserDashboardModal(); handleLogout()" class="py-2.5 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-xs font-bold transition text-center cursor-pointer">
                         🚪 Logout
                     </button>
                 </div>
@@ -3760,14 +3936,14 @@ ${c.dnaLockToken || c.clothing}`
     <!-- ============================================================ -->
     <!-- 3. PRICING MODAL                                             -->
     <!-- ============================================================ -->
-    <div id="pricingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-4xl rounded-2xl border border-pink-500/40 p-6 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closePricingModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold">✕</button>
+    <div id="pricingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass-panel w-full max-w-4xl rounded-3xl border border-amber-500/40 p-7 space-y-6 shadow-[0_0_60px_rgba(245,158,11,0.18)] relative max-h-[92vh] overflow-y-auto viewfinder-card">
+            <button onclick="closePricingModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center text-sm font-bold transition cursor-pointer">✕</button>
 
             <div class="text-center space-y-2">
-                <span class="text-xs font-mono font-bold text-pink-400 uppercase tracking-widest">OFFICIAL SUBSCRIPTION PLANS</span>
-                <h2 class="text-2xl font-black text-white">GLOBAL GENERATOR 8K STUDIO</h2>
-                <p class="text-xs text-gray-400 max-w-md mx-auto">Select a plan suited to your production scale and unlock master 8K scripts and character-locked visual prompts.</p>
+                <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest block">OFFICIAL SUBSCRIPTION PLANS</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white studio-heading"><span class="gold-gradient-text">GLOBAL GENERATOR</span> 8K STUDIO</h2>
+                <p class="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">Select a plan suited to your production scale and unlock master 8K scripts and character-locked visual prompts.</p>
             </div>
 
             <!-- 3 Pricing Cards -->
@@ -3780,48 +3956,50 @@ ${c.dnaLockToken || c.clothing}`
     <!-- ============================================================ -->
     <!-- 4. PAYMENT INSTRUCTIONS & SUBMISSION MODAL                   -->
     <!-- ============================================================ -->
-    <div id="paymentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-lg rounded-2xl border border-cyan-500/40 p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold">✕</button>
+    <div id="paymentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-amber-500/40 p-7 space-y-5 shadow-[0_0_60px_rgba(245,158,11,0.18)] relative max-h-[92vh] overflow-y-auto viewfinder-card">
+            <button onclick="closePaymentModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center text-sm font-bold transition cursor-pointer">✕</button>
 
-            <div class="border-b border-white/10 pb-3">
-                <span class="text-xs font-mono text-cyan-400 font-bold uppercase tracking-wider">EASYPAISA PAYMENT & VERIFICATION</span>
-                <h3 class="text-lg font-black text-white">Easypaisa Payment Submission & Verification</h3>
+            <div class="border-b border-white/10 pb-3.5">
+                <span class="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider block">EASYPAISA PAYMENT & VERIFICATION</span>
+                <h3 class="text-lg font-black text-white studio-heading mt-0.5">Easypaisa Payment Submission & Verification</h3>
             </div>
 
             <!-- Selected Plan & Price Banner -->
-            <div class="bg-black/60 p-4 rounded-xl border border-white/10 flex items-center justify-between">
+            <div class="bg-black/60 p-4 rounded-2xl border border-white/10 flex items-center justify-between">
                 <div>
-                    <span class="text-xs text-gray-400 block">Selected Plan:</span>
+                    <span class="text-xs text-gray-400 block font-mono">Selected Plan:</span>
                     <b id="paySelectedPlanName" class="text-white text-base">Monthly Plan</b>
                 </div>
                 <div class="text-right">
-                    <span class="text-xs text-gray-400 block">Amount:</span>
-                    <b id="paySelectedPlanPrice" class="text-cyan-400 text-lg font-mono">PKR 3,000</b>
+                    <span class="text-xs text-gray-400 block font-mono">Amount:</span>
+                    <b id="paySelectedPlanPrice" class="text-cyan-400 text-lg font-mono font-bold">PKR 3,000</b>
                 </div>
             </div>
 
             <!-- Easypaisa Receiving Account Details -->
-            <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-950/60 to-black border border-emerald-500/40 space-y-2">
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-black border border-emerald-500/40 space-y-2.5">
                 <div class="flex items-center justify-between border-b border-white/10 pb-2">
-                    <span class="text-xs font-bold text-emerald-400">📲 Easypaisa Official Receiving Account</span>
+                    <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                        <span>📲</span> Official Receiving Account (Easypaisa)
+                    </span>
                     <span class="text-[10px] text-gray-400 font-mono">Manual Verification</span>
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                        <span class="text-[10px] text-gray-400 block font-mono">Account Name / Title:</span>
+                    <div class="bg-black/40 p-2.5 rounded-xl border border-emerald-500/20">
+                        <span class="text-[10px] text-gray-400 block font-mono">Account Title:</span>
                         <b id="payEasypaisaAccountName" class="text-white text-sm">Sufyan Habib</b>
                     </div>
-                    <div>
+                    <div class="bg-black/40 p-2.5 rounded-xl border border-emerald-500/20">
                         <span class="text-[10px] text-gray-400 block font-mono">Account Number:</span>
-                        <b id="payEasypaisaAccountNumber" class="text-emerald-300 font-mono text-base tracking-wider">03008998381</b>
+                        <b id="payEasypaisaAccountNumber" class="text-emerald-300 font-mono text-base font-bold tracking-wider">03008998381</b>
                     </div>
                 </div>
                 <p class="text-[11px] text-gray-300 pt-1">
                     <b>Instructions:</b> Transfer the plan amount via Easypaisa to the account above and enter your transaction ID below.
                 </p>
                 <div class="text-[10px] text-gray-400 flex items-center justify-between pt-1 border-t border-white/5">
-                    <span>Support Contact: <span id="paySupportContactText" class="text-cyan-300">WhatsApp: 03008998381</span></span>
+                    <span>Support Contact: <span id="paySupportContactText" class="text-cyan-300 font-mono font-semibold">WhatsApp: 03008998381</span></span>
                     <span class="text-amber-400 font-bold">🔒 No PIN / OTP required</span>
                 </div>
             </div>
@@ -3845,31 +4023,31 @@ ${c.dnaLockToken || c.clothing}`
 
                 <!-- Transaction Reference -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1">Easypaisa Transaction ID / Reference Number <span class="text-pink-500">*</span></label>
-                    <input id="payTrxRef" type="text" required placeholder="e.g. 7891234567 or TRX8291039" class="w-full bg-black/70 border border-gta-border rounded-xl p-2.5 text-xs text-white gta-border-glow focus:outline-none font-mono" />
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Easypaisa Transaction ID / Reference Number <span class="text-amber-400 font-bold">*</span></label>
+                    <input id="payTrxRef" type="text" required placeholder="e.g. 7891234567 or TRX8291039" class="w-full bg-black/70 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400 font-mono" />
                 </div>
 
                 <!-- Payment Date -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1">Payment Date <span class="text-pink-500">*</span></label>
-                    <input id="payPaymentDate" type="date" required class="w-full bg-black/70 border border-gta-border rounded-xl p-2.5 text-xs text-white focus:outline-none font-mono" />
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Payment Date <span class="text-amber-400 font-bold">*</span></label>
+                    <input id="payPaymentDate" type="date" required class="w-full bg-black/70 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400 font-mono" />
                 </div>
 
                 <!-- Upload Screenshot -->
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">Upload Payment Screenshot / Receipt (Image Upload)</label>
-                    <input id="payScreenshotInput" type="file" accept="image/*" onchange="handleScreenshotFileSelect(event)" class="w-full bg-black/70 border border-gta-border rounded-xl p-2 text-xs text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-black hover:file:bg-cyan-500 cursor-pointer" />
+                    <input id="payScreenshotInput" type="file" accept="image/*" onchange="handleScreenshotFileSelect(event)" class="w-full bg-black/70 border border-white/10 rounded-xl p-2 text-xs text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-black hover:file:bg-amber-400 cursor-pointer" />
                     <div id="payScreenshotPreview" class="hidden mt-2 p-2 bg-black/60 border border-white/10 rounded-xl flex items-center gap-3">
-                        <img id="payScreenshotPreviewImg" src="" alt="Receipt Preview" class="w-16 h-16 object-cover rounded-lg border border-cyan-400/40" />
+                        <img id="payScreenshotPreviewImg" src="" alt="Receipt Preview" class="w-16 h-16 object-cover rounded-lg border border-amber-400/40" />
                         <span class="text-xs text-emerald-400">✓ Payment receipt screenshot attached successfully</span>
                     </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-gray-900 border border-gray-800 text-[11px] text-gray-400">
+                <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] text-gray-400">
                     💡 Your payment details will be routed to mission control for verification and immediate activation.
                 </div>
 
-                <button id="paySubmitBtn" type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-black font-extrabold text-xs uppercase tracking-wider transition active:scale-95 shadow-xl cursor-pointer">
+                <button id="paySubmitBtn" type="submit" class="w-full py-4 rounded-2xl director-cta-btn text-black font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-xl cursor-pointer">
                     Submit Payment
                 </button>
             </form>
@@ -3880,7 +4058,7 @@ ${c.dnaLockToken || c.clothing}`
     <!-- 5. ADMIN CONTROL PANEL MODAL                                 -->
     <!-- ============================================================ -->
     <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-lg">
-        <div class="glass-panel w-full max-w-6xl rounded-2xl border border-amber-500/50 p-6 space-y-6 shadow-2xl relative max-h-[95vh] overflow-y-auto">
+        <div class="glass-panel w-full max-w-6xl rounded-2xl border border-amber-500/40 p-6 space-y-6 shadow-2xl relative max-h-[95vh] overflow-y-auto">
             
             <!-- Admin Top Bar -->
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
@@ -4068,9 +4246,9 @@ ${c.dnaLockToken || c.clothing}`
                     <h4 class="text-sm font-bold text-white border-b border-white/10 pb-2">Official Subscription Plans & Pricing</h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-black/60 p-4 rounded-xl border border-pink-500/30 space-y-3">
+                        <div class="bg-black/60 p-4 rounded-xl border border-blue-500/30 space-y-3">
                             <div class="flex items-center justify-between">
-                                <b class="text-xs text-pink-400 font-mono">Monthly Plan</b>
+                                <b class="text-xs text-blue-400 font-mono">Monthly Plan</b>
                                 <span class="text-[10px] text-gray-400 font-mono">30 Days</span>
                             </div>
                             <div>
@@ -4090,9 +4268,9 @@ ${c.dnaLockToken || c.clothing}`
                             </div>
                         </div>
 
-                        <div class="bg-black/60 p-4 rounded-xl border border-purple-500/30 space-y-3">
+                        <div class="bg-black/60 p-4 rounded-xl border border-indigo-500/30 space-y-3">
                             <div class="flex items-center justify-between">
-                                <b class="text-xs text-purple-400 font-mono">Annual Plan</b>
+                                <b class="text-xs text-indigo-400 font-mono">Annual Plan</b>
                                 <span class="text-[10px] text-gray-400 font-mono">1 Year (365 Days)</span>
                             </div>
                             <div>
@@ -4219,7 +4397,7 @@ ${c.dnaLockToken || c.clothing}`
     <!-- 7. ADMIN EXTEND SUBSCRIPTION SUBMODAL                        -->
     <!-- ============================================================ -->
     <div id="adminExtendModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-sm rounded-2xl border border-purple-500/50 p-5 space-y-4 shadow-2xl relative">
+        <div class="glass-panel w-full max-w-sm rounded-2xl border border-indigo-500/50 p-5 space-y-4 shadow-2xl relative">
             <button onclick="adminCloseExtendModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold">✕</button>
             <h3 class="text-sm font-extrabold text-white">EXTEND SUBSCRIPTION</h3>
             <p class="text-xs text-gray-400">Client: <b id="adminExtendUserName" class="text-white">User</b></p>
@@ -4235,7 +4413,7 @@ ${c.dnaLockToken || c.clothing}`
                         <option value="7">7 Days (Trial Extension)</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs transition cursor-pointer">
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs transition cursor-pointer">
                     CONFIRM SUBSCRIPTION EXTENSION
                 </button>
             </form>

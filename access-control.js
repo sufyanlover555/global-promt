@@ -135,17 +135,17 @@ function updateGatekeeperNotice() {
     if (!noticeBox) return;
 
     if (!currentUser) {
-        noticeBox.className = "p-3 rounded-xl bg-purple-950/80 border border-purple-500/50 text-xs text-purple-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `🔒 <b>Studio License & Subscription Required!</b><br><span class="text-[11px] text-gray-300 font-normal">Please sign in or register to activate your studio license and access all 8K generation tools.</span>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-slate-900/90 border border-indigo-500/40 text-xs text-slate-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `🔒 <b>Studio License & Subscription Required</b><br><span class="text-[11px] text-slate-400 font-normal">Please sign in or register to activate your studio license and access all 8K generation tools.</span>`;
     } else if (currentUser.status === 'PENDING') {
-        noticeBox.className = "p-3 rounded-xl bg-amber-950/90 border border-amber-500/50 text-xs text-amber-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `⏳ <b>Account Pending Admin Access Approval</b><br><span class="text-[11px] text-amber-300 font-normal">Your account has been registered. Sufyan Habib (Administrator) will review and activate your access shortly.</span><div class="mt-2.5 flex flex-wrap items-center justify-center gap-2"><button type="button" onclick="openPaymentModal('${currentUser.subscription?.plan || 'Monthly'}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">💰 Submit Payment Proof</button><button type="button" onclick="fetchCurrentUserProfile()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition">🔄 Check Status</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">Sign Out</button></div>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-amber-950/70 border border-amber-500/50 text-xs text-amber-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `⏳ <b>Account Pending Administrator Approval</b><br><span class="text-[11px] text-amber-300/80 font-normal">Your account is registered. Sufyan Habib (Administrator) will review and activate your access shortly.</span><div class="mt-2.5 flex flex-wrap items-center justify-center gap-2"><button type="button" onclick="openPaymentModal('${currentUser.subscription?.plan || 'Monthly'}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">💰 Submit Payment Proof</button><button type="button" onclick="fetchCurrentUserProfile()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-black text-xs font-bold transition">🔄 Check Status</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Sign Out</button></div>`;
     } else if (currentUser.status === 'EXPIRED') {
-        noticeBox.className = "p-3 rounded-xl bg-red-950/90 border border-red-500/50 text-xs text-red-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `⚠️ <b>Studio License Expired</b><br><span class="text-[11px] text-gray-300 font-normal">Please renew your membership plan to restore 8K generation capabilities.</span><div class="mt-2.5 flex items-center justify-center gap-2"><button type="button" onclick="openPricingModal()" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold transition">View Plans & Renew</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">Sign Out</button></div>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-rose-950/70 border border-rose-500/50 text-xs text-rose-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `⚠️ <b>Studio License Expired</b><br><span class="text-[11px] text-slate-400 font-normal">Please renew your membership plan to restore 8K generation capabilities.</span><div class="mt-2.5 flex items-center justify-center gap-2"><button type="button" onclick="openPricingModal()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition">View Plans & Renew</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">Sign Out</button></div>`;
     } else if (currentUser.status === 'BLOCKED' || currentUser.status === 'REJECTED') {
-        noticeBox.className = "p-3 rounded-xl bg-red-950/90 border border-red-500/50 text-xs text-red-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `🚫 <b>Access Suspended (${currentUser.status})</b><br><span class="text-[11px] text-gray-300 font-normal">Account access restricted by administration. Support contact: 03008998381</span><div class="mt-2.5"><button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition">Sign Out</button></div>`;
+        noticeBox.className = "p-3.5 rounded-xl bg-red-950/80 border border-red-500/50 text-xs text-red-200 text-center font-semibold mb-3 shadow-lg";
+        noticeBox.innerHTML = `🚫 <b>Access Suspended (${currentUser.status})</b><br><span class="text-[11px] text-slate-400 font-normal">Account access restricted by administration. Support contact: 03008998381</span><div class="mt-2.5"><button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition">Sign Out</button></div>`;
     } else {
         noticeBox.innerHTML = '';
         noticeBox.className = "hidden";
@@ -344,7 +344,7 @@ function switchAuthTab(tab) {
         if (resetForm) resetForm.classList.add('hidden');
         if (signupForm) signupForm.classList.remove('hidden');
         if (loginTabBtn) loginTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
-        if (signupTabBtn) signupTabBtn.className = "py-2 px-4 text-xs font-bold text-pink-400 border-b-2 border-pink-500 transition cursor-pointer";
+        if (signupTabBtn) signupTabBtn.className = "py-2 px-4 text-xs font-bold text-amber-400 border-b-2 border-amber-500 transition cursor-pointer";
         if (resetTabBtn) resetTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
     } else if (tab === 'reset') {
         if (loginForm) loginForm.classList.add('hidden');
@@ -358,7 +358,7 @@ function switchAuthTab(tab) {
         if (signupForm) signupForm.classList.add('hidden');
         if (resetForm) resetForm.classList.add('hidden');
         if (loginForm) loginForm.classList.remove('hidden');
-        if (loginTabBtn) loginTabBtn.className = "py-2 px-4 text-xs font-bold text-pink-400 border-b-2 border-pink-500 transition cursor-pointer";
+        if (loginTabBtn) loginTabBtn.className = "py-2 px-4 text-xs font-bold text-amber-400 border-b-2 border-amber-500 transition cursor-pointer";
         if (signupTabBtn) signupTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
         if (resetTabBtn) resetTabBtn.className = "py-2 px-4 text-xs font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition cursor-pointer";
     }
@@ -532,7 +532,7 @@ async function openUserDashboardModal() {
         if (activeNotice) activeNotice.classList.remove('hidden');
         if (openGenBtn) {
             openGenBtn.disabled = false;
-            openGenBtn.className = "w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-black font-extrabold text-sm tracking-wider uppercase transition shadow-xl shadow-emerald-500/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2";
+            openGenBtn.className = "w-full py-4 px-6 rounded-2xl director-cta-btn text-black font-black text-sm tracking-wider uppercase transition shadow-2xl active:scale-95 cursor-pointer flex items-center justify-center gap-2";
         }
     } else if (status === 'PENDING') {
         if (pendingNotice) pendingNotice.classList.remove('hidden');
@@ -704,25 +704,25 @@ function renderPricingCards() {
     availablePlans.forEach(p => {
         const isPopular = p.popular;
         html += `
-        <div class="relative glass-panel rounded-2xl p-6 border ${isPopular ? 'border-pink-500 shadow-2xl shadow-pink-500/20' : 'border-gta-border'} flex flex-col justify-between space-y-5">
-            ${isPopular ? `<span class="absolute -top-3 right-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-md">MOST POPULAR</span>` : ''}
+        <div class="relative glass-panel rounded-3xl p-6 border ${isPopular ? 'border-amber-500 shadow-2xl shadow-amber-500/20 ring-1 ring-amber-400/40' : 'border-white/10'} flex flex-col justify-between space-y-5 bg-gradient-to-b from-black/80 to-slate-950/90 viewfinder-card">
+            ${isPopular ? `<span class="absolute -top-3 right-6 bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-[10px] font-black uppercase px-3.5 py-1 rounded-full shadow-lg tracking-wider">MOST POPULAR</span>` : ''}
             <div>
-                <h3 class="text-xl font-extrabold text-white mb-1">${p.name}</h3>
-                <p class="text-xs text-gray-400">${p.durationLabel || `${p.durationDays} Days`} Full Access</p>
+                <h3 class="text-xl font-black text-white mb-1">${p.name}</h3>
+                <p class="text-xs text-gray-400">${p.durationLabel || `${p.durationDays} Days`} Full Studio Access</p>
                 <div class="my-4">
                     <span class="text-3xl font-black text-white">PKR ${Number(p.price).toLocaleString()}</span>
                     <span class="text-xs text-gray-400">/ ${p.durationLabel || `${p.durationDays} Days`}</span>
                 </div>
-                <ul class="space-y-2 text-xs text-gray-300">
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Full 8K Cinematic Screenplay Generator</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Dynamic Character DNA Consistency Lock</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Zero-Failure AI Video Prompts (Kling, Runway, Luma, Sora)</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Midjourney v6.1 Keyframe Visual Prompts</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> High-Speed Groq LPU Cloud Acceleration</li>
+                <ul class="space-y-2.5 text-xs text-gray-300">
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Full 8K Cinematic Screenplay Generator</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Dynamic Character DNA Consistency Lock</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Zero-Failure AI Video Prompts (Kling, Runway, Luma, Sora)</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> Midjourney v6.1 & FLUX.1 Keyframe Prompts</li>
+                    <li class="flex items-center gap-2"><span class="text-amber-400 font-bold">✓</span> High-Speed Groq LPU Cloud Acceleration</li>
                 </ul>
             </div>
-            <button onclick="handleSelectPlan('${p.id}')" class="w-full py-3.5 rounded-xl ${isPopular ? 'bg-gradient-to-r from-pink-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white' : 'bg-white/10 hover:bg-white/20 text-white'} font-black text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-lg flex items-center justify-center gap-1.5">
-                <span>💎</span> <span>Buy Plan</span>
+            <button onclick="handleSelectPlan('${p.id}')" class="w-full py-3.5 rounded-2xl ${isPopular ? 'director-cta-btn text-black font-black' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold'} text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-md">
+                <span>💎</span> <span>Select Plan</span>
             </button>
         </div>
         `;
@@ -1166,7 +1166,7 @@ function renderAdminUsersTable(users) {
                     <button onclick="adminUnblockUser('${u.id}')" title="Restore user access" class="px-2 py-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-[10px] transition cursor-pointer">
                         🔓 UNBLOCK
                     </button>`}
-                    <button onclick="adminOpenExtendModal('${u.id}')" title="Extend subscription duration" class="px-2 py-1 bg-purple-700/80 hover:bg-purple-600 text-white rounded text-[10px] transition cursor-pointer">
+                    <button onclick="adminOpenExtendModal('${u.id}')" title="Extend subscription duration" class="px-2 py-1 bg-indigo-700/80 hover:bg-indigo-600 text-white rounded text-[10px] transition cursor-pointer">
                         ⏳ EXTEND
                     </button>
                     <button onclick="adminOpenEditModal('${u.id}')" title="Edit creator profile" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
@@ -1636,7 +1636,7 @@ async function loadAdminAuditLogs() {
             html += `
             <tr class="border-b border-white/5 hover:bg-white/5 transition text-xs">
                 <td class="p-3 font-mono text-gray-400 text-[11px]">${new Date(l.created_at).toLocaleString()}</td>
-                <td class="p-3 font-bold text-pink-400">${l.action}</td>
+                <td class="p-3 font-bold text-indigo-400">${l.action}</td>
                 <td class="p-3 text-gray-300">${l.details}</td>
                 <td class="p-3 text-gray-400 font-mono text-[11px]">${l.admin_email || l.admin_id}</td>
             </tr>
