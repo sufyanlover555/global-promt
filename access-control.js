@@ -33,9 +33,9 @@ var authToken = (typeof localStorage !== 'undefined' ? localStorage.getItem('gta
 var currentUser = null;
 var availablePlans = [];
 var easypaisaConfig = {
-    accountName: 'سفیان حبیب (Sufyan Habib)',
+    accountName: 'Sufyan Habib',
     accountNumber: '03008998381',
-    instructions: 'Easypaisa کے ذریعے اپنے منتخب کردہ Plan کی رقم ادا کریں۔',
+    instructions: 'Pay the exact amount for your chosen subscription plan via Easypaisa or Direct Transfer.',
     supportContact: 'WhatsApp: 03008998381'
 };
 var currentAdminUsers = [];
@@ -58,19 +58,19 @@ function showToast(msg) {
 
 function configureServerUrl() {
     const current = (typeof window.API_BASE !== 'undefined' && window.API_BASE) ? window.API_BASE : (window.location.origin || 'http://localhost:3000');
-    const newUrl = prompt("🌐 سرور ایڈریس درج کریں (Server URL):\nاگر سرور اسی ویب سائٹ پر ہے تو خالی چھوڑ دیں، ورنہ ایڈمن کا دیا گیا سرور لنک درج کریں:", current);
+    const newUrl = prompt("🌐 Configure API Server URL:\nLeave blank if hosted on this domain, or enter custom backend URL:", current);
     if (newUrl !== null) {
         const clean = newUrl.trim().replace(/\/+$/, '');
         if (clean === '' || clean === window.location.origin) {
             localStorage.removeItem('gta_api_server_url');
             window.API_BASE = (window.location.protocol === 'file:' || window.location.origin === 'null') ? 'http://localhost:3000' : '';
             API_BASE = window.API_BASE;
-            showToast("سرور ری سیٹ ہو گیا (Current Website)");
+            showToast("Server reset to default website origin.");
         } else {
             localStorage.setItem('gta_api_server_url', clean);
             window.API_BASE = clean;
             API_BASE = clean;
-            showToast("سرور ایڈریس محفوظ ہو گیا: " + clean);
+            showToast("Server URL configured: " + clean);
         }
         fetchCurrentUserProfile();
     }
@@ -136,16 +136,16 @@ function updateGatekeeperNotice() {
 
     if (!currentUser) {
         noticeBox.className = "p-3 rounded-xl bg-purple-950/80 border border-purple-500/50 text-xs text-purple-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `🔒 <b>لائسنس اور سبسکرپشن ایکٹیویشن درکار ہے!</b><br><span class="text-[11px] text-gray-300 font-normal">ٹول اوپن کرنے کے لیے لاگ اِن کریں یا نیا اکاؤنٹ بنا کر ری چارج کریں۔</span>`;
+        noticeBox.innerHTML = `🔒 <b>Studio License & Subscription Required!</b><br><span class="text-[11px] text-gray-300 font-normal">Please sign in or register to activate your studio license and access all 8K generation tools.</span>`;
     } else if (currentUser.status === 'PENDING') {
         noticeBox.className = "p-3 rounded-xl bg-amber-950/90 border border-amber-500/50 text-xs text-amber-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `⏳ <b>اکاؤنٹ تصدیق کے مراحل میں ہے (Pending Verification)</b><br><span class="text-[11px] text-amber-300 font-normal">آپ کی ادائیگی کی تصدیق ہوتے ہی سفیان حبیب (ایڈمن) کی طرف سے ٹول فوراً انلاک کر دیا جائے گا۔</span><div class="mt-2.5 flex flex-wrap items-center justify-center gap-2"><button type="button" onclick="openPaymentModal('${currentUser.subscription?.plan || 'Monthly'}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">💰 ادائیگی کی رسید جمع کرائیں</button><button type="button" onclick="fetchCurrentUserProfile()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition">🔄 اسٹیٹس چیک کریں</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">لاگ آؤٹ</button></div>`;
+        noticeBox.innerHTML = `⏳ <b>Account Pending Admin Access Approval</b><br><span class="text-[11px] text-amber-300 font-normal">Your account has been registered. Sufyan Habib (Administrator) will review and activate your access shortly.</span><div class="mt-2.5 flex flex-wrap items-center justify-center gap-2"><button type="button" onclick="openPaymentModal('${currentUser.subscription?.plan || 'Monthly'}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">💰 Submit Payment Proof</button><button type="button" onclick="fetchCurrentUserProfile()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition">🔄 Check Status</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">Sign Out</button></div>`;
     } else if (currentUser.status === 'EXPIRED') {
         noticeBox.className = "p-3 rounded-xl bg-red-950/90 border border-red-500/50 text-xs text-red-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `⚠️ <b>آپ کا ری چارج ختم ہو چکا ہے (Expired)</b><br><span class="text-[11px] text-gray-300 font-normal">ٹول دوبارہ فعال کرنے کے لیے نیا ری چارج منتخب کریں۔</span><div class="mt-2.5 flex items-center justify-center gap-2"><button type="button" onclick="openPricingModal()" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold transition">ری چارج پلانز دیکھیں</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">لاگ آؤٹ</button></div>`;
+        noticeBox.innerHTML = `⚠️ <b>Studio License Expired</b><br><span class="text-[11px] text-gray-300 font-normal">Please renew your membership plan to restore 8K generation capabilities.</span><div class="mt-2.5 flex items-center justify-center gap-2"><button type="button" onclick="openPricingModal()" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold transition">View Plans & Renew</button><button type="button" onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold transition">Sign Out</button></div>`;
     } else if (currentUser.status === 'BLOCKED' || currentUser.status === 'REJECTED') {
         noticeBox.className = "p-3 rounded-xl bg-red-950/90 border border-red-500/50 text-xs text-red-200 text-center font-bold mb-3 shadow-inner";
-        noticeBox.innerHTML = `🚫 <b>رسائی بند ہے (${currentUser.status})</b><br><span class="text-[11px] text-gray-300 font-normal">آپ کا اکاؤنٹ ایڈمن نے بلاک یا مسترد کر دیا ہے۔ برائے رابطہ: 03008998381</span><div class="mt-2.5"><button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition">لاگ آؤٹ</button></div>`;
+        noticeBox.innerHTML = `🚫 <b>Access Suspended (${currentUser.status})</b><br><span class="text-[11px] text-gray-300 font-normal">Account access restricted by administration. Support contact: 03008998381</span><div class="mt-2.5"><button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition">Sign Out</button></div>`;
     } else {
         noticeBox.innerHTML = '';
         noticeBox.className = "hidden";
@@ -207,11 +207,11 @@ function updateUserUI(user) {
         if (adminBtn) adminBtn.classList.add('hidden');
 
         if (subBannerText) {
-            subBannerText.innerHTML = `رسائی کی حالت: <b class="text-white">براہ کرم لاگ ان کریں</b>`;
+            subBannerText.innerHTML = `Studio Access: <b class="text-white">Please Sign In</b>`;
         }
         if (subBannerIcon) subBannerIcon.innerText = '🔒';
         if (subBannerBtn) {
-            subBannerBtn.innerText = 'لاگ ان';
+            subBannerBtn.innerText = 'Sign In';
             subBannerBtn.onclick = () => openAuthModal('login');
         }
         return;
@@ -266,34 +266,34 @@ function updateUserUI(user) {
     // Update bottom generator status strip
     if (subBannerText && subBannerBtn) {
         if (user.role === 'ADMIN') {
-            subBannerText.innerHTML = `ایڈمن رسائی: <b class="text-yellow-400">مکمل کنٹرول و لامحدود رسائی</b>`;
+            subBannerText.innerHTML = `Director Access: <b class="text-yellow-400">Master Console & Unlimited Generation</b>`;
             if (subBannerIcon) subBannerIcon.innerText = '👑';
-            subBannerBtn.innerText = 'ایڈمن پینل';
+            subBannerBtn.innerText = 'Mission Control';
             subBannerBtn.onclick = () => openAdminModal();
         } else if (status === 'ACTIVE') {
-            subBannerText.innerHTML = `سبسکرپشن: <b class="text-emerald-400">${sub?.plan || 'Active'}</b> — باقی دن: <b class="text-white">${daysLeft} Days</b>`;
+            subBannerText.innerHTML = `Studio License: <b class="text-emerald-400">${sub?.plan || 'Active'}</b> — Days Remaining: <b class="text-white">${daysLeft} Days</b>`;
             if (subBannerIcon) subBannerIcon.innerText = '⚡';
-            subBannerBtn.innerText = 'میرا اکاؤنٹ';
+            subBannerBtn.innerText = 'My Account';
             subBannerBtn.onclick = () => openUserDashboardModal();
         } else if (status === 'PENDING') {
-            subBannerText.innerHTML = `<span class="text-amber-300">آپ کی payment verification کے لیے pending ہے۔</span>`;
+            subBannerText.innerHTML = `<span class="text-amber-300">Account registered — Pending Administrator approval.</span>`;
             if (subBannerIcon) subBannerIcon.innerText = '⏳';
-            subBannerBtn.innerText = 'تفصیلات دیکھیں';
+            subBannerBtn.innerText = 'View Status';
             subBannerBtn.onclick = () => openUserDashboardModal();
         } else if (status === 'EXPIRED') {
-            subBannerText.innerHTML = `<span class="text-red-400">آپ کا subscription ختم ہو چکا ہے۔</span>`;
+            subBannerText.innerHTML = `<span class="text-red-400">Studio subscription expired. Renew to resume generating.</span>`;
             if (subBannerIcon) subBannerIcon.innerText = '❌';
-            subBannerBtn.innerText = 'تجدید کریں';
+            subBannerBtn.innerText = 'Renew License';
             subBannerBtn.onclick = () => openPricingModal();
         } else if (status === 'BLOCKED') {
-            subBannerText.innerHTML = `<span class="text-red-400">آپ کا access administrator نے بند کر دیا ہے۔</span>`;
+            subBannerText.innerHTML = `<span class="text-red-400">Access suspended by administrator.</span>`;
             if (subBannerIcon) subBannerIcon.innerText = '🚫';
-            subBannerBtn.innerText = 'اکاؤنٹ اسٹیٹس';
+            subBannerBtn.innerText = 'Account Status';
             subBannerBtn.onclick = () => openUserDashboardModal();
         } else if (status === 'REJECTED') {
-            subBannerText.innerHTML = `<span class="text-red-400">آپ کی ادائیگی مسترد کر دی گئی ہے۔</span>`;
+            subBannerText.innerHTML = `<span class="text-red-400">Payment receipt rejected. Submit valid proof.</span>`;
             if (subBannerIcon) subBannerIcon.innerText = '⚠️';
-            subBannerBtn.innerText = 'دوبارہ ادائیگی';
+            subBannerBtn.innerText = 'Resubmit Proof';
             subBannerBtn.onclick = () => openPricingModal();
         }
     }
@@ -321,7 +321,7 @@ function openAuthModal(tab = 'login') {
 
 function closeAuthModal() {
     if (!isUserActiveAndAuthorized(currentUser)) {
-        showToast("🔒 ٹول تک رسائی کے لیے فعال ری چارج و ایکٹیویشن لازمی ہے!");
+        showToast("🔒 Active studio license required to access generation tools!");
         return;
     }
     const modal = document.getElementById('authModal');
@@ -374,7 +374,7 @@ async function handleLoginSubmit(e) {
     if (!email || !password) return;
 
     btn.disabled = true;
-    btn.innerHTML = `<span class="animate-spin">⏳</span> لاگ ان ہو رہا ہے...`;
+    btn.innerHTML = `<span class="animate-spin">⏳</span> Authenticating...`;
     if (authError) authError.classList.add('hidden');
 
     try {
@@ -386,7 +386,7 @@ async function handleLoginSubmit(e) {
         const data = await res.json();
 
         if (!res.ok) {
-            throw new Error(data.error || 'لاگ ان ناکام ہو گیا');
+            throw new Error(data.error || 'Sign in failed. Check credentials.');
         }
 
         authToken = data.token;
@@ -401,9 +401,9 @@ async function handleLoginSubmit(e) {
 
         if (isUserActiveAndAuthorized(currentUser)) {
             closeAuthModal();
-            showToast(`خوش آمدید، ${currentUser.name}!`);
+            showToast(`Welcome back, ${currentUser.name}!`);
         } else {
-            showToast(`لاگ ان کامیاب، لیکن آپ کا اکاؤنٹ فعال نہیں ہے!`);
+            showToast(`Signed in successfully! Account pending admin approval.`);
         }
     } catch (err) {
         if (authError) {
@@ -412,7 +412,7 @@ async function handleLoginSubmit(e) {
         }
     } finally {
         btn.disabled = false;
-        btn.innerText = 'لاگ ان کریں (LOGIN)';
+        btn.innerText = 'SIGN IN';
     }
 }
 
@@ -428,7 +428,7 @@ async function handleSignupSubmit(e) {
     if (!name || !email || !password) return;
 
     btn.disabled = true;
-    btn.innerHTML = `<span class="animate-spin">⏳</span> اکاؤنٹ بن رہا ہے...`;
+    btn.innerHTML = `<span class="animate-spin">⏳</span> Creating Account...`;
     if (authError) authError.classList.add('hidden');
 
     try {
@@ -440,7 +440,7 @@ async function handleSignupSubmit(e) {
         const data = await res.json();
 
         if (!res.ok) {
-            throw new Error(data.error || 'رجسٹریشن ناکام ہو گئی');
+            throw new Error(data.error || 'Registration failed. Check inputs.');
         }
 
         authToken = data.token;
@@ -452,7 +452,7 @@ async function handleSignupSubmit(e) {
 
         updateUserUI(currentUser);
         enforceGatekeeperLock();
-        showToast("اکاؤنٹ بن گیا! براہ کرم اپنی ادائیگی جمع کرائیں۔");
+        showToast("Account created! Awaiting admin access approval.");
 
         // Immediately open Payment modal for the chosen plan
         openPaymentModal(plan);
@@ -463,7 +463,7 @@ async function handleSignupSubmit(e) {
         }
     } finally {
         btn.disabled = false;
-        btn.innerText = 'نیا اکاؤنٹ بنائیں (CREATE ACCOUNT)';
+        btn.innerText = 'CREATE ACCOUNT';
     }
 }
 
@@ -482,7 +482,7 @@ async function handleLogout() {
     currentUser = null;
     updateUserUI(null);
     enforceGatekeeperLock();
-    showToast("آپ کامیابی سے لاگ آؤٹ ہو چکے ہیں");
+    showToast("You have been signed out.");
 }
 
 // ============================================================
@@ -578,7 +578,7 @@ async function loadUserPaymentHistory() {
     const tbody = document.getElementById('dashPaymentHistoryBody');
     if (!tbody) return;
 
-    tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-xs text-gray-400">لوڈ ہو رہا ہے...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-xs text-gray-400">Loading payment records...</td></tr>`;
 
     try {
         const res = await apiFetch('/api/user/payments', {
@@ -589,7 +589,7 @@ async function loadUserPaymentHistory() {
         const payments = data.payments || [];
 
         if (payments.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-xs text-gray-500">کوئی ادائیگی ریکارڈ نہیں ہوئی</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-xs text-gray-500">No payment records found</td></tr>`;
             return;
         }
 
@@ -627,19 +627,19 @@ async function loadUserPaymentHistory() {
 }
 
 async function checkPaymentStatus() {
-    showToast("🔄 اسٹیٹس چیک کیا جا رہا ہے...");
+    showToast("Checking account status...");
     const user = await fetchCurrentUserProfile();
     await loadUserPaymentHistory();
 
     if (user) {
         if (user.status === 'ACTIVE') {
-            showToast("✓ مبارک ہو! آپ کا اکاؤنٹ ایکٹیو ہے اور ٹول دستیاب ہے۔");
+            showToast("✓ License Active! All 8K studio tools unlocked.");
         } else if (user.status === 'PENDING') {
-            showToast("⏳ آپ کی payment verification کے لیے pending ہے۔");
+            showToast("⏳ Account registered — Pending Administrator approval.");
         } else if (user.status === 'EXPIRED') {
-            showToast("❌ آپ کی subscription ختم ہو چکی ہے۔ نیا پلان خریدیں۔");
+            showToast("❌ Studio subscription expired. Please renew your plan.");
         } else if (user.status === 'REJECTED') {
-            showToast("⚠️ آپ کی ادائیگی مسترد کر دی گئی ہے۔ ایڈمن سے رابطہ کریں۔");
+            showToast("⚠️ Payment receipt rejected. Please contact support.");
         }
     }
 }
@@ -649,9 +649,9 @@ function openGeneratorFromDashboard() {
         closeUserDashboardModal();
         const mainInput = document.getElementById('topicInput');
         if (mainInput) mainInput.focus();
-        showToast("✓ گلوبل جنریٹر کھلا ہے! موضوع درج کریں اور کہانی بنائیں");
+        showToast("✓ Studio Unlocked! Enter a storyline to generate 8K screenplay.");
     } else {
-        showToast("⚠️ فعال رسائی درکار ہے!");
+        showToast("⚠️ Active studio license required!");
     }
 }
 
@@ -705,20 +705,20 @@ function renderPricingCards() {
         const isPopular = p.popular;
         html += `
         <div class="relative glass-panel rounded-2xl p-6 border ${isPopular ? 'border-pink-500 shadow-2xl shadow-pink-500/20' : 'border-gta-border'} flex flex-col justify-between space-y-5">
-            ${isPopular ? `<span class="absolute -top-3 right-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-md">سب سے مقبول</span>` : ''}
+            ${isPopular ? `<span class="absolute -top-3 right-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-md">MOST POPULAR</span>` : ''}
             <div>
                 <h3 class="text-xl font-extrabold text-white mb-1">${p.name}</h3>
                 <p class="text-xs text-gray-400">${p.durationLabel || `${p.durationDays} Days`} Full Access</p>
                 <div class="my-4">
                     <span class="text-3xl font-black text-white">PKR ${Number(p.price).toLocaleString()}</span>
-                    <span class="text-xs text-gray-400">/ ${p.durationLabel || `${p.durationDays} دن`}</span>
+                    <span class="text-xs text-gray-400">/ ${p.durationLabel || `${p.durationDays} Days`}</span>
                 </div>
                 <ul class="space-y-2 text-xs text-gray-300">
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> مکمل 8K سنیماٹک اسکرپٹ جنریٹر</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> ڈائنامک کریکٹر ڈی این اے مستقل لاک</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Zero-Failure AI ویڈیو پرامپٹس (Kling, Runway, Luma)</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Midjourney v6.1 کی فریم پرامپٹس</li>
-                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> تیز رفتار Groq LPU کلاؤڈ پروسیسنگ</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Full 8K Cinematic Screenplay Generator</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Dynamic Character DNA Consistency Lock</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Zero-Failure AI Video Prompts (Kling, Runway, Luma, Sora)</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Midjourney v6.1 Keyframe Visual Prompts</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> High-Speed Groq LPU Cloud Acceleration</li>
                 </ul>
             </div>
             <button onclick="handleSelectPlan('${p.id}')" class="w-full py-3.5 rounded-xl ${isPopular ? 'bg-gradient-to-r from-pink-600 to-cyan-500 hover:from-pink-500 hover:to-cyan-400 text-white' : 'bg-white/10 hover:bg-white/20 text-white'} font-black text-xs uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-lg flex items-center justify-center gap-1.5">
@@ -735,7 +735,7 @@ function handleSelectPlan(planId) {
     if (!currentUser) {
         closePricingModal();
         openAuthModal('signup');
-        showToast("براہ کرم سبسکرپشن لینے کے لیے پہلے اکاؤنٹ بنائیں!");
+        showToast("Please sign in or register to purchase a subscription!");
         return;
     }
 
@@ -821,7 +821,7 @@ function handleScreenshotFileSelect(e) {
 
     // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
-        alert('فائل کا سائز 5MB سے زیادہ نہیں ہونا چاہیے!');
+        alert('File size must not exceed 5MB!');
         e.target.value = '';
         return;
     }
@@ -846,12 +846,12 @@ async function handlePaymentSubmit(e) {
     const btn = document.getElementById('paySubmitBtn');
 
     if (!transactionReference) {
-        alert('براہ کرم Easypaisa Transaction ID درج کریں!');
+        alert('Please enter your Easypaisa Transaction ID / Reference!');
         return;
     }
 
     btn.disabled = true;
-    btn.innerHTML = `<span class="animate-spin">⏳</span> بھیجا جا رہا ہے...`;
+    btn.innerHTML = `<span class="animate-spin">⏳</span> Submitting Payment Proof...`;
 
     try {
         const res = await apiFetch('/api/payments/submit', {
@@ -871,12 +871,12 @@ async function handlePaymentSubmit(e) {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'ادائیگی جمع کرانے میں خرابی');
+        if (!res.ok) throw new Error(data.error || 'Failed to submit payment proof');
 
         closePaymentModal();
         await fetchCurrentUserProfile();
         openUserDashboardModal();
-        showToast("آپ کی payment verification کے لیے بھیج دی گئی ہے۔ Admin verification کے بعد آپ کا account activate کیا جائے گا۔");
+        showToast("Payment proof submitted! Access will be granted shortly upon verification.");
     } catch (err) {
         alert(err.message);
     } finally {
@@ -889,9 +889,11 @@ async function handlePaymentSubmit(e) {
 // 5. ADMIN CONTROL PANEL
 // ============================================================
 
+let adminAutoRefreshTimer = null;
+
 function openAdminModal() {
     if (!currentUser || currentUser.role !== 'ADMIN') {
-        showToast("صرف ایڈمن کو رسائی کی اجازت ہے!");
+        showToast("Restricted: Administrator access only!");
         return;
     }
 
@@ -901,11 +903,25 @@ function openAdminModal() {
 
     loadAdminStats();
     setAdminTab('users');
+
+    // Auto-poll stats and users every 10 seconds to catch new signups live
+    if (adminAutoRefreshTimer) clearInterval(adminAutoRefreshTimer);
+    adminAutoRefreshTimer = setInterval(() => {
+        const isVisible = modal && !modal.classList.contains('hidden');
+        if (isVisible) {
+            loadAdminStats();
+            loadAdminUsers(null, true);
+        }
+    }, 10000);
 }
 
 function closeAdminModal() {
     const modal = document.getElementById('adminModal');
     if (modal) modal.classList.add('hidden');
+    if (adminAutoRefreshTimer) {
+        clearInterval(adminAutoRefreshTimer);
+        adminAutoRefreshTimer = null;
+    }
 }
 
 function setAdminTab(tab) {
@@ -939,6 +955,32 @@ function setAdminTab(tab) {
     }
 }
 
+function selectAdminUserFilter(status) {
+    const filterSelect = document.getElementById('adminUserStatusFilter');
+    if (filterSelect) filterSelect.value = status;
+
+    // Highlight active pill
+    document.querySelectorAll('.user-filter-pill').forEach(pill => {
+        pill.classList.remove('ring-2', 'ring-white', 'scale-105', 'bg-white/20');
+    });
+    const currentPill = document.getElementById(`userFilterPill-${status}`);
+    if (currentPill) currentPill.classList.add('ring-2', 'ring-white', 'scale-105', 'bg-white/20');
+
+    // Highlight stat card
+    document.querySelectorAll('.stat-filter-card').forEach(c => {
+        c.classList.remove('ring-2', 'ring-amber-400', 'ring-emerald-400', 'ring-white');
+    });
+    const card = document.getElementById(`statCard-${status}`);
+    if (card) {
+        if (status === 'ACTIVE') card.classList.add('ring-2', 'ring-emerald-400');
+        else if (status === 'PENDING') card.classList.add('ring-2', 'ring-amber-400');
+        else card.classList.add('ring-2', 'ring-white');
+    }
+
+    setAdminTab('users');
+    loadAdminUsers();
+}
+
 async function loadAdminStats() {
     try {
         const res = await apiFetch('/api/admin/stats', {
@@ -947,16 +989,50 @@ async function loadAdminStats() {
         if (!res.ok) return;
         const stats = await res.json();
 
-        document.getElementById('statTotalUsers').innerText = stats.totalUsers || 0;
-        document.getElementById('statActiveUsers').innerText = stats.activeUsers || 0;
-        document.getElementById('statPendingUsers').innerText = stats.pendingUsers || 0;
-        document.getElementById('statExpiredUsers').innerText = stats.expiredUsers || 0;
-        document.getElementById('statBlockedUsers').innerText = stats.blockedUsers || 0;
-        document.getElementById('statActiveSubs').innerText = stats.totalActiveSubscriptions || 0;
+        const totalUsersEl = document.getElementById('statTotalUsers');
+        if (totalUsersEl) totalUsersEl.innerText = stats.totalUsers || 0;
+        const activeUsersEl = document.getElementById('statActiveUsers');
+        if (activeUsersEl) activeUsersEl.innerText = stats.activeUsers || 0;
+        const pendingUsersEl = document.getElementById('statPendingUsers');
+        if (pendingUsersEl) pendingUsersEl.innerText = stats.pendingUsers || 0;
+        const expiredUsersEl = document.getElementById('statExpiredUsers');
+        if (expiredUsersEl) expiredUsersEl.innerText = stats.expiredUsers || 0;
+        const blockedUsersEl = document.getElementById('statBlockedUsers');
+        if (blockedUsersEl) blockedUsersEl.innerText = stats.blockedUsers || 0;
+        const activeSubsEl = document.getElementById('statActiveSubs');
+        if (activeSubsEl) activeSubsEl.innerText = stats.totalActiveSubscriptions || 0;
+
+        // Update pills
+        const badgePending = document.getElementById('badgePillPending');
+        if (badgePending) badgePending.innerText = stats.pendingUsers || 0;
+        const badgeActive = document.getElementById('badgePillActive');
+        if (badgeActive) badgeActive.innerText = stats.activeUsers || 0;
+
+        // Pending banner
+        const banner = document.getElementById('adminPendingAlertBanner');
+        const bannerCount = document.getElementById('adminPendingBannerCount');
+        if (banner) {
+            if ((stats.pendingUsers || 0) > 0) {
+                banner.classList.remove('hidden');
+                if (bannerCount) bannerCount.innerText = `${stats.pendingUsers} Pending Requests`;
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        // Nav bar Admin button badge
+        const adminNavBtn = document.getElementById('adminNavBtn');
+        if (adminNavBtn) {
+            if ((stats.pendingUsers || 0) > 0) {
+                adminNavBtn.innerHTML = `<span>👑</span> <span>Admin Panel</span> <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse shadow-md">${stats.pendingUsers} Pending</span>`;
+            } else {
+                adminNavBtn.innerHTML = `<span>👑</span> <span>Admin Mission Control</span>`;
+            }
+        }
     } catch (_) {}
 }
 
-async function loadAdminUsers(filterStatus = null) {
+async function loadAdminUsers(filterStatus = null, silent = false) {
     if (filterStatus) {
         const filterSelect = document.getElementById('adminUserStatusFilter');
         if (filterSelect) filterSelect.value = filterStatus;
@@ -967,7 +1043,16 @@ async function loadAdminUsers(filterStatus = null) {
     const plan = document.getElementById('adminUserPlanFilter')?.value || 'ALL';
     const tbody = document.getElementById('adminUsersTableBody');
 
-    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-xs text-gray-400"><div class="inline-block animate-spin mr-2">⚡</div> صارفین لوڈ ہو رہے ہیں...</td></tr>`;
+    // Update pill highlight to match current status
+    document.querySelectorAll('.user-filter-pill').forEach(pill => {
+        pill.classList.remove('ring-2', 'ring-white', 'scale-105', 'bg-white/20');
+    });
+    const currentPill = document.getElementById(`userFilterPill-${status}`);
+    if (currentPill) currentPill.classList.add('ring-2', 'ring-white', 'scale-105', 'bg-white/20');
+
+    if (tbody && !silent) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-xs text-gray-400"><div class="inline-block animate-spin mr-2">⚡</div> Loading creators and licenses...</td></tr>`;
+    }
 
     try {
         const params = new URLSearchParams({ q: query, status, plan });
@@ -983,7 +1068,7 @@ async function loadAdminUsers(filterStatus = null) {
             renderAdminUsersTable(currentAdminUsers);
         } else {
             const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error || 'صارفین کی فہرست حاصل نہیں ہو سکی');
+            throw new Error(errData.error || 'Failed to retrieve creators list');
         }
     } catch (err) {
         // Fallback to local cache if available
@@ -992,8 +1077,8 @@ async function loadAdminUsers(filterStatus = null) {
         if (cached && cached.length > 0) {
             currentAdminUsers = cached;
             renderAdminUsersTable(currentAdminUsers);
-            showToast("ℹ️ مقامی کیشے سے صارفین دکھائے جا رہے ہیں");
-        } else if (tbody) {
+            if (!silent) showToast("ℹ️ Showing creators from local cache");
+        } else if (tbody && !silent) {
             tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-red-400">⚠️ ${err.message}</td></tr>`;
         }
     }
@@ -1004,7 +1089,11 @@ function renderAdminUsersTable(users) {
     if (!tbody) return;
 
     if (!users || users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-xs text-gray-500">کوئی صارف نہیں ملا (No users found in this filter)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-xs text-gray-500">
+            <div class="text-3xl mb-2">📭</div>
+            <div class="font-bold text-gray-400">No creators found in this filter</div>
+            <div class="text-[11px] text-gray-500 mt-1">There are currently no records matching this filter.</div>
+        </td></tr>`;
         return;
     }
 
@@ -1012,62 +1101,81 @@ function renderAdminUsersTable(users) {
     users.forEach(u => {
         let badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
         let statusLabel = u.status;
-        if (u.status === 'ACTIVE') {
-            badgeColor = 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.2)]';
-            statusLabel = '● ایکٹو (ACTIVE)';
+        let isPending = (u.status === 'PENDING');
+        let isActive = (u.status === 'ACTIVE');
+        let rowClass = 'border-b border-white/5 hover:bg-white/5 transition text-xs';
+
+        if (isActive) {
+            badgeColor = 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.2)] font-bold';
+            statusLabel = '● ACTIVE';
         } else if (u.status === 'BLOCKED') {
             badgeColor = 'bg-red-600/30 text-red-300 border-red-500/60 shadow-[0_0_10px_rgba(239,68,68,0.2)]';
-            statusLabel = '✖ بلاک (BLOCKED)';
+            statusLabel = '✖ BLOCKED';
         } else if (u.status === 'EXPIRED') {
             badgeColor = 'bg-rose-950 text-rose-400 border-rose-600/40';
-            statusLabel = '⚠️ ختم (EXPIRED)';
-        } else if (u.status === 'PENDING') {
-            badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-            statusLabel = '⏳ زیر التواء (PENDING)';
+            statusLabel = '⚠️ EXPIRED';
+        } else if (isPending) {
+            badgeColor = 'bg-amber-500/30 text-amber-200 border-amber-400/60 font-extrabold animate-pulse';
+            statusLabel = '⏳ PENDING APPROVAL';
+            rowClass = 'border-b border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/15 transition text-xs';
         }
 
         const startDateFormatted = u.start_date ? new Date(u.start_date).toLocaleDateString() : '-';
         const expiryDateFormatted = u.expiry_date ? new Date(u.expiry_date).toLocaleDateString() : '-';
+        const createdDateFormatted = u.created_at ? new Date(u.created_at).toLocaleString() : '-';
+        const safeName = (u.name || 'User').replace(/'/g, "\\'");
 
         html += `
-        <tr class="border-b border-white/5 hover:bg-white/5 transition text-xs">
+        <tr class="${rowClass}">
             <td class="p-3 font-bold text-white flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full ${u.status === 'ACTIVE' ? 'bg-emerald-400 animate-pulse' : (u.status === 'BLOCKED' ? 'bg-red-500' : 'bg-amber-400')}"></span>
-                ${u.name}
+                <span class="w-2.5 h-2.5 rounded-full ${isActive ? 'bg-emerald-400 animate-pulse' : (u.status === 'BLOCKED' ? 'bg-red-500' : 'bg-amber-400 animate-ping')}"></span>
+                <div>
+                    <div>${u.name}</div>
+                    ${isPending ? `<span class="text-[10px] text-amber-300 font-normal">Registered: ${createdDateFormatted}</span>` : ''}
+                </div>
             </td>
             <td class="p-3 text-gray-300 font-mono text-[11px]">${u.email}</td>
             <td class="p-3 font-semibold text-cyan-300">${u.plan || 'Monthly'}</td>
-            <td class="p-3 text-gray-300">PKR ${Number(u.price || 3000).toLocaleString()}</td>
+            <td class="p-3 text-gray-300 font-mono">PKR ${Number(u.price || 3000).toLocaleString()}</td>
             <td class="p-3 text-gray-400 font-mono text-[11px]">${startDateFormatted}</td>
-            <td class="p-3 text-gray-400 font-mono text-[11px]">${expiryDateFormatted} <span class="text-cyan-400 font-bold">(${u.daysRemaining}d)</span></td>
+            <td class="p-3 text-gray-400 font-mono text-[11px]">${expiryDateFormatted} ${isActive ? `<span class="text-cyan-400 font-bold">(${u.daysRemaining}d)</span>` : ''}</td>
             <td class="p-3">
                 <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold border inline-block ${badgeColor}">${statusLabel}</span>
             </td>
             <td class="p-3">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                    <button onclick="adminViewUser('${u.id}')" title="تفصیلات" class="px-2 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-[10px] transition cursor-pointer">
+                    ${isPending ? `
+                    <button onclick="adminActivateUser('${u.id}', '${safeName}')" title="Grant instant studio access" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-black rounded-lg text-xs transition cursor-pointer shadow-lg active:scale-95 flex items-center gap-1">
+                        <span>⚡</span> <span>GRANT ACCESS (ACTIVATE)</span>
+                    </button>
+                    <button onclick="adminDeleteUser('${u.id}', '${safeName}')" title="Reject signup request" class="px-2 py-1.5 bg-red-950 hover:bg-red-900 border border-red-500/50 text-red-300 font-bold rounded-lg text-[11px] transition cursor-pointer">
+                        ❌ REJECT
+                    </button>
+                    ` : `
+                    <button onclick="adminViewUser('${u.id}')" title="View creator details" class="px-2 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-[10px] transition cursor-pointer">
                         VIEW
                     </button>
-                    ${u.status !== 'ACTIVE' ? `
-                    <button onclick="adminActivateUser('${u.id}')" title="اکاؤنٹ فعال کر کے ایکسس دیں" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded text-[10px] transition cursor-pointer shadow">
-                        ✅ ایکسس دیں (ACTIVATE)
+                    ${!isActive ? `
+                    <button onclick="adminActivateUser('${u.id}', '${safeName}')" title="Activate studio license" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded text-[10px] transition cursor-pointer shadow">
+                        ⚡ ACTIVATE
                     </button>` : ''}
                     ${u.status !== 'BLOCKED' ? `
-                    <button onclick="adminBlockUser('${u.id}')" title="فوری طور پر صارف کی رسائی بلاک کریں" class="px-2.5 py-1 bg-red-600/90 hover:bg-red-600 text-white font-bold rounded text-[10px] transition cursor-pointer">
-                        🚫 بلاک کریں (BLOCK)
+                    <button onclick="adminBlockUser('${u.id}')" title="Block user access" class="px-2 py-1 bg-red-600/90 hover:bg-red-600 text-white font-bold rounded text-[10px] transition cursor-pointer">
+                        🚫 BLOCK
                     </button>` : `
-                    <button onclick="adminUnblockUser('${u.id}')" title="بلاک ختم کر کے رسائی بحال کریں" class="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-[10px] transition cursor-pointer">
-                        🔓 ان بلاک کریں (UNBLOCK)
+                    <button onclick="adminUnblockUser('${u.id}')" title="Restore user access" class="px-2 py-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-[10px] transition cursor-pointer">
+                        🔓 UNBLOCK
                     </button>`}
-                    <button onclick="adminOpenExtendModal('${u.id}')" title="سبسکرپشن کے دن بڑھائیں" class="px-2 py-1 bg-purple-700/80 hover:bg-purple-600 text-white rounded text-[10px] transition cursor-pointer">
-                        ⏳ دن بڑھائیں
+                    <button onclick="adminOpenExtendModal('${u.id}')" title="Extend subscription duration" class="px-2 py-1 bg-purple-700/80 hover:bg-purple-600 text-white rounded text-[10px] transition cursor-pointer">
+                        ⏳ EXTEND
                     </button>
-                    <button onclick="adminOpenEditModal('${u.id}')" title="ایڈٹ کریں" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
-                        ✏️ ایڈٹ
+                    <button onclick="adminOpenEditModal('${u.id}')" title="Edit creator profile" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
+                        ✏️ EDIT
                     </button>
-                    <button onclick="adminDeleteUser('${u.id}')" title="مستقل ڈیلیٹ کریں" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500/40 text-red-300 rounded text-[10px] transition cursor-pointer">
+                    <button onclick="adminDeleteUser('${u.id}', '${safeName}')" title="Permanently delete user" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500/40 text-red-300 rounded text-[10px] transition cursor-pointer">
                         🗑️
                     </button>
+                    `}
                 </div>
             </td>
         </tr>
@@ -1077,8 +1185,8 @@ function renderAdminUsersTable(users) {
     tbody.innerHTML = html;
 }
 
-async function adminActivateUser(userId) {
-    if (!confirm('کیا آپ واقعی اس صارف کو فوری ایکسس دے کر فعال (ACTIVATE) کرنا چاہتے ہیں؟')) return;
+async function adminActivateUser(userId, userName = 'User') {
+    if (!confirm(`Grant immediate full studio access to "${userName}"?\nTheir license will be activated and generation tools unlocked immediately.`)) return;
     try {
         const res = await apiFetch(`/api/admin/users/${userId}/activate`, {
             method: 'POST',
@@ -1086,12 +1194,12 @@ async function adminActivateUser(userId) {
             body: JSON.stringify({})
         });
         if (res.ok) {
-            showToast("صارف کامیابی سے فعال (Active) کر دیا گیا!");
-            loadAdminStats();
-            loadAdminUsers();
+            showToast("🎉 Success! Access granted and studio license activated.");
+            await loadAdminStats();
+            await loadAdminUsers();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'ایکٹیویشن ناکام ہو گئی');
+            alert(d.error || 'Activation failed.');
         }
     } catch (err) {
         alert(err.message);
@@ -1099,19 +1207,19 @@ async function adminActivateUser(userId) {
 }
 
 async function adminBlockUser(userId) {
-    if (!confirm('کیا آپ واقعی اس صارف کو بلاک (BLOCK) کرنا چاہتے ہیں؟ اس کی تمام AI جنریشن اور ٹول رسائی فوری بند ہو جائے گی۔')) return;
+    if (!confirm(`Block access for this user? All generation access and active sessions will be revoked.`)) return;
     try {
         const res = await apiFetch(`/api/admin/users/${userId}/block`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف کو بلاک (Blocked) کر دیا گیا!");
+            showToast("User has been blocked.");
             loadAdminStats();
             loadAdminUsers();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'بلاک کرنے میں خرابی پیش آئی');
+            alert(d.error || 'Failed to block user.');
         }
     } catch (err) {
         alert(err.message);
@@ -1125,32 +1233,33 @@ async function adminUnblockUser(userId) {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف کی رسائی بحال (Unblocked) کر دی گئی!");
+            showToast("User access restored (Unblocked).");
             loadAdminStats();
             loadAdminUsers();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'ان بلاک کرنے میں خرابی پیش آئی');
+            alert(d.error || 'Failed to unblock user.');
         }
     } catch (err) {
         alert(err.message);
     }
 }
 
-async function adminDeleteUser(userId) {
-    if (!confirm('کیا آپ واقعی اس صارف کو مستقل طور پر حذف کرنا چاہتے ہیں؟')) return;
+async function adminDeleteUser(userId, userName = '') {
+    const promptMsg = userName ? `Permanently delete "${userName}" from database?` : 'Permanently delete this user?';
+    if (!confirm(promptMsg)) return;
     try {
         const res = await apiFetch(`/api/admin/users/${userId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف کامیابی سے ڈیلیٹ کر دیا گیا!");
+            showToast("User permanently deleted.");
             loadAdminStats();
             loadAdminUsers();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'ڈیلیٹ کرنے میں خرابی پیش آئی');
+            alert(d.error || 'Failed to delete user.');
         }
     } catch (err) {
         alert(err.message);
@@ -1160,7 +1269,7 @@ async function adminDeleteUser(userId) {
 function adminViewUser(userId) {
     const user = currentAdminUsers.find(u => u.id === userId);
     if (!user) return;
-    alert(`صارف کی تفصیلات:\nنام: ${user.name}\nای میل: ${user.email}\nپلان: ${user.plan}\nاسٹیٹس: ${user.status}\nتاریخ آغاز: ${new Date(user.start_date).toLocaleString()}\nتاریخ اختتام: ${new Date(user.expiry_date).toLocaleString()}\nباقی دن: ${user.daysRemaining}`);
+    alert(`Creator Details:\nName: ${user.name}\nEmail: ${user.email}\nPlan: ${user.plan}\nStatus: ${user.status}\nStart Date: ${new Date(user.start_date).toLocaleString()}\nExpiry Date: ${new Date(user.expiry_date).toLocaleString()}\nDays Remaining: ${user.daysRemaining}`);
 }
 
 // Create User Submodal
@@ -1195,7 +1304,7 @@ async function adminSubmitCreateUser(e) {
         if (!res.ok) throw new Error(data.error || 'Failed to create user');
 
         adminCloseCreateModal();
-        showToast("نیا صارف کامیابی سے بن گیا!");
+        showToast("New user created successfully!");
         loadAdminStats();
         loadAdminUsers();
     } catch (err) {
@@ -1229,12 +1338,12 @@ async function adminSubmitExtend(e) {
         });
         if (res.ok) {
             adminCloseExtendModal();
-            showToast(`سبسکرپشن میں ${days} دن کا اضافہ کر دیا گیا!`);
+            showToast(`Extended subscription by ${days} days!`);
             loadAdminStats();
             loadAdminUsers();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'دن بڑھانے میں خرابی');
+            alert(d.error || 'Failed to extend subscription days');
         }
     } catch (err) {
         alert(err.message);
@@ -1286,12 +1395,12 @@ async function adminSubmitEditUser(e) {
 
         if (res.ok) {
             adminCloseEditModal();
-            showToast("صارف کی تفصیلات اپ ڈیٹ ہو گئیں!");
+            showToast("User details updated successfully!");
             loadAdminStats();
             loadAdminUsers();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'ایڈٹ ناکام ہو گیا');
+            alert(d.error || 'Failed to update user.');
         }
     } catch (err) {
         alert(err.message);
@@ -1301,7 +1410,7 @@ async function adminSubmitEditUser(e) {
 // Admin Payments Management
 async function loadAdminPayments() {
     const tbody = document.getElementById('adminPaymentsTableBody');
-    if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-xs text-gray-400">لوڈ ہو رہا ہے...</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-xs text-gray-400">Loading payment verifications...</td></tr>`;
 
     try {
         const res = await apiFetch('/api/admin/payments', {
@@ -1320,7 +1429,7 @@ function renderAdminPaymentsTable(payments) {
     if (!tbody) return;
 
     if (!payments || payments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-xs text-gray-500">کوئی ادائیگی جمع نہیں ہوئی (No payments recorded)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-xs text-gray-500">No payment receipts recorded yet</td></tr>`;
         return;
     }
 
@@ -1350,8 +1459,8 @@ function renderAdminPaymentsTable(payments) {
             <td class="p-3">
                 ${p.screenshot_url ? `
                 <button onclick="viewPaymentScreenshot('${p.screenshot_url}')" class="px-2 py-1 bg-cyan-950 text-cyan-300 border border-cyan-500/40 rounded text-[10px] font-bold hover:bg-cyan-900 transition flex items-center gap-1 cursor-pointer">
-                    <span>🖼️</span> <span>رسید دیکھیں</span>
-                </button>` : `<span class="text-gray-500 text-[10px]">کوئی رسید نہیں</span>`}
+                    <span>🖼️</span> <span>View Receipt</span>
+                </button>` : `<span class="text-gray-500 text-[10px]">No Receipt</span>`}
             </td>
             <td class="p-3 text-gray-400 font-mono text-[11px]">${submissionDate}</td>
             <td class="p-3">
@@ -1366,7 +1475,7 @@ function renderAdminPaymentsTable(payments) {
                     <button onclick="adminRejectPayment('${p.id}')" class="px-2.5 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-[10px] font-black tracking-wide transition cursor-pointer shadow-md shadow-red-600/30">
                         Reject Payment
                     </button>
-                </div>` : `<span class="text-gray-500 text-[10px]">مکمل شدہ</span>`}
+                </div>` : `<span class="text-gray-500 text-[10px]">Processed</span>`}
             </td>
         </tr>
         `;
@@ -1392,19 +1501,19 @@ function closeScreenshotModal() {
 }
 
 async function adminVerifyPayment(paymentId) {
-    if (!confirm('کیا آپ واقعی اس ادائیگی کی تصدیق کر کے صارف کا اکاؤنٹ فعال کرنا چاہتے ہیں؟\n\n- Monthly Plan: +30 Days\n- 6 Months Plan: +6 Calendar Months')) return;
+    if (!confirm('Verify this payment and activate user studio license?\n\n- Monthly Plan: +30 Days\n- 6 Months Plan: +6 Months\n- Annual Plan: +1 Year')) return;
     try {
         const res = await apiFetch(`/api/admin/payments/${paymentId}/verify`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("✓ Payment Approved! صارف کا اکاؤنٹ کامیابی سے فعال ہو گیا۔");
+            showToast("✓ Payment Approved! User license activated successfully.");
             loadAdminStats();
             loadAdminPayments();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'ادائیگی کی تصدیق ناکام');
+            alert(d.error || 'Payment verification failed');
         }
     } catch (err) {
         alert(err.message);
@@ -1412,19 +1521,19 @@ async function adminVerifyPayment(paymentId) {
 }
 
 async function adminRejectPayment(paymentId) {
-    if (!confirm('کیا آپ واقعی یہ ادائیگی مسترد کرنا چاہتے ہیں؟ اس صارف کا اکاؤنٹ بند رہے گا۔')) return;
+    if (!confirm('Are you sure you want to reject this payment receipt? User will remain unverified.')) return;
     try {
         const res = await apiFetch(`/api/admin/payments/${paymentId}/reject`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("✕ Payment Rejected! ادائیگی مسترد کر دی گئی۔");
+            showToast("✕ Payment Rejected: Receipt marked as invalid.");
             loadAdminStats();
             loadAdminPayments();
         } else {
             const d = await res.json().catch(() => ({}));
-            alert(d.error || 'ادائیگی مسترد کرنے میں خرابی');
+            alert(d.error || 'Failed to reject payment');
         }
     } catch (err) {
         alert(err.message);
@@ -1450,7 +1559,7 @@ async function loadAdminSettings() {
             document.getElementById('setSupportContact').value = s.support_contact || 'WhatsApp: +92 300 1234567';
         }
         if (document.getElementById('setPaymentInstructions')) {
-            document.getElementById('setPaymentInstructions').value = s.payment_instructions || 'Easypaisa کے ذریعے اپنے منتخب کردہ Plan کی رقم ادا کریں۔';
+            document.getElementById('setPaymentInstructions').value = s.payment_instructions || 'Transfer the exact subscription fee via Easypaisa or Direct Bank Transfer.';
         }
         if (document.getElementById('setMonthlyPrice')) {
             document.getElementById('setMonthlyPrice').value = s.plan_monthly_price || '3000';
@@ -1473,7 +1582,7 @@ async function loadAdminSettings() {
 async function adminSaveSettings(e) {
     e.preventDefault();
     const payload = {
-        easypaisa_account_name: document.getElementById('setEasypaisaName')?.value || 'سفیان حبیب (Sufyan Habib)',
+        easypaisa_account_name: document.getElementById('setEasypaisaName')?.value || 'Sufyan Habib',
         easypaisa_account_number: document.getElementById('setEasypaisaNumber')?.value || '03008998381',
         support_contact: document.getElementById('setSupportContact')?.value || 'WhatsApp: 03008998381',
         payment_instructions: document.getElementById('setPaymentInstructions')?.value || '',
@@ -1491,14 +1600,14 @@ async function adminSaveSettings(e) {
             body: JSON.stringify(payload)
         });
         if (res.ok) {
-            showToast("تمام سیٹنگز کامیابی سے محفوظ ہو گئیں!");
+            showToast("Settings saved successfully!");
             // Refresh local easypaisaConfig
             easypaisaConfig.accountName = payload.easypaisa_account_name;
             easypaisaConfig.accountNumber = payload.easypaisa_account_number;
             easypaisaConfig.supportContact = payload.support_contact;
             easypaisaConfig.instructions = payload.payment_instructions;
         } else {
-            alert('سیٹنگز محفوظ کرنے میں خرابی');
+            alert('Failed to save settings.');
         }
     } catch (err) {
         alert(err.message);
@@ -1508,7 +1617,7 @@ async function adminSaveSettings(e) {
 // Admin Audit Logs
 async function loadAdminAuditLogs() {
     const tbody = document.getElementById('adminLogsTableBody');
-    if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs text-gray-400">لوڈ ہو رہا ہے...</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs text-gray-400">Loading audit trail...</td></tr>`;
 
     try {
         const res = await apiFetch('/api/admin/audit-logs', {
@@ -1518,7 +1627,7 @@ async function loadAdminAuditLogs() {
         const logs = data.logs || [];
 
         if (logs.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs text-gray-500">کوئی سرگرمی نہیں (No logs yet)</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs text-gray-500">No audit logs recorded yet</td></tr>`;
             return;
         }
 
@@ -1545,11 +1654,11 @@ async function loadAdminAuditLogs() {
 
 async function adminExportBackup() {
     try {
-        showToast("بیک اپ تیار ہو رہا ہے...");
+        showToast("Exporting studio database backup...");
         const res = await apiFetch('/api/admin/export-data', {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
-        if (!res.ok) throw new Error('بیک اپ ایکسپورٹ ناکام ہو گیا');
+        if (!res.ok) throw new Error('Backup export failed');
         const data = await res.json();
         
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1562,7 +1671,7 @@ async function adminExportBackup() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        showToast("✅ بیک اپ فائل کامیابی سے ڈاؤن لوڈ ہو گئی!");
+        showToast("✅ Studio backup file downloaded successfully!");
     } catch (err) {
         alert(err.message);
     }
@@ -1579,9 +1688,9 @@ async function adminImportBackup() {
             const text = await file.text();
             const json = JSON.parse(text);
             
-            if (!confirm(`کیا آپ واقعی اس فائل (${file.name}) سے تمام صارفین اور ڈیٹا بحال (RESTORE) کرنا چاہتے ہیں؟`)) return;
+            if (!confirm(`Are you sure you want to restore all creators and database records from "${file.name}"?`)) return;
             
-            showToast("ڈیٹا سرور پر بھیجا جا رہا ہے...");
+            showToast("Uploading and restoring database...");
             const res = await apiFetch('/api/admin/import-data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
@@ -1590,14 +1699,14 @@ async function adminImportBackup() {
             
             const result = await res.json();
             if (res.ok) {
-                showToast(`✅ ${result.importedUsers || 'تمام'} صارفین کامیابی سے بحال ہو گئے!`);
+                showToast(`✅ ${result.importedUsers || 'All'} creators restored successfully!`);
                 loadAdminStats();
                 loadAdminUsers();
             } else {
-                alert(result.error || 'بحالی ناکام ہو گئی');
+                alert(result.error || 'Database restore failed.');
             }
         } catch (err) {
-            alert('غلط بیک اپ فائل یا پروسیسنگ خرابی: ' + err.message);
+            alert('Invalid backup file or processing error: ' + err.message);
         }
     };
     input.click();
