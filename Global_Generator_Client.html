@@ -965,25 +965,46 @@ async function loadAdminStats() {
     } catch (_) {}
 }
 
-async function loadAdminUsers() {
+async function loadAdminUsers(filterStatus = null) {
+    if (filterStatus) {
+        const filterSelect = document.getElementById('adminUserStatusFilter');
+        if (filterSelect) filterSelect.value = filterStatus;
+    }
+
     const query = document.getElementById('adminUserSearchInput')?.value || '';
     const status = document.getElementById('adminUserStatusFilter')?.value || 'ALL';
     const plan = document.getElementById('adminUserPlanFilter')?.value || 'ALL';
     const tbody = document.getElementById('adminUsersTableBody');
 
-    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-gray-400">لوڈ ہو رہا ہے...</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-xs text-gray-400"><div class="inline-block animate-spin mr-2">⚡</div> صارفین لوڈ ہو رہے ہیں...</td></tr>`;
 
     try {
         const params = new URLSearchParams({ q: query, status, plan });
-        const res = await fetch(`/api/admin/users?${params.toString()}`, {
+        const res = await apiFetch(`/api/admin/users?${params.toString()}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
-        if (!res.ok) throw new Error('Failed to fetch users');
-        const data = await res.json();
-        currentAdminUsers = data.users || [];
-        renderAdminUsersTable(currentAdminUsers);
+        
+        if (res.ok) {
+            const data = await res.json();
+            currentAdminUsers = data.users || [];
+            // Cache locally so admin panel works offline or during server restarts
+            try { localStorage.setItem('gta_admin_users_cache', JSON.stringify(currentAdminUsers)); } catch (_) {}
+            renderAdminUsersTable(currentAdminUsers);
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'صارفین کی فہرست حاصل نہیں ہو سکی');
+        }
     } catch (err) {
-        if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-red-400">${err.message}</td></tr>`;
+        // Fallback to local cache if available
+        let cached = [];
+        try { cached = JSON.parse(localStorage.getItem('gta_admin_users_cache') || '[]'); } catch (_) {}
+        if (cached && cached.length > 0) {
+            currentAdminUsers = cached;
+            renderAdminUsersTable(currentAdminUsers);
+            showToast("ℹ️ مقامی کیشے سے صارفین دکھائے جا رہے ہیں");
+        } else if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-red-400">⚠️ ${err.message}</td></tr>`;
+        }
     }
 }
 
@@ -992,56 +1013,69 @@ function renderAdminUsersTable(users) {
     if (!tbody) return;
 
     if (!users || users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-gray-500">کوئی صارف نہیں ملا (No users found)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-xs text-gray-500">کوئی صارف نہیں ملا (No users found in this filter)</td></tr>`;
         return;
     }
 
     let html = '';
     users.forEach(u => {
-        let badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-        if (u.status === 'ACTIVE') badgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-        else if (u.status === 'BLOCKED') badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
-        else if (u.status === 'EXPIRED') badgeColor = 'bg-red-500/20 text-red-400 border-red-500/30';
-        else if (u.status === 'REJECTED') badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
+        let badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        let statusLabel = u.status;
+        if (u.status === 'ACTIVE') {
+            badgeColor = 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.2)]';
+            statusLabel = '● ایکٹو (ACTIVE)';
+        } else if (u.status === 'BLOCKED') {
+            badgeColor = 'bg-red-600/30 text-red-300 border-red-500/60 shadow-[0_0_10px_rgba(239,68,68,0.2)]';
+            statusLabel = '✖ بلاک (BLOCKED)';
+        } else if (u.status === 'EXPIRED') {
+            badgeColor = 'bg-rose-950 text-rose-400 border-rose-600/40';
+            statusLabel = '⚠️ ختم (EXPIRED)';
+        } else if (u.status === 'PENDING') {
+            badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+            statusLabel = '⏳ زیر التواء (PENDING)';
+        }
 
         const startDateFormatted = u.start_date ? new Date(u.start_date).toLocaleDateString() : '-';
         const expiryDateFormatted = u.expiry_date ? new Date(u.expiry_date).toLocaleDateString() : '-';
 
         html += `
         <tr class="border-b border-white/5 hover:bg-white/5 transition text-xs">
-            <td class="p-3 font-bold text-white">${u.name}</td>
-            <td class="p-3 text-gray-300 font-mono">${u.email}</td>
+            <td class="p-3 font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full ${u.status === 'ACTIVE' ? 'bg-emerald-400 animate-pulse' : (u.status === 'BLOCKED' ? 'bg-red-500' : 'bg-amber-400')}"></span>
+                ${u.name}
+            </td>
+            <td class="p-3 text-gray-300 font-mono text-[11px]">${u.email}</td>
             <td class="p-3 font-semibold text-cyan-300">${u.plan || 'Monthly'}</td>
             <td class="p-3 text-gray-300">PKR ${Number(u.price || 3000).toLocaleString()}</td>
             <td class="p-3 text-gray-400 font-mono text-[11px]">${startDateFormatted}</td>
-            <td class="p-3 text-gray-400 font-mono text-[11px]">${expiryDateFormatted} (${u.daysRemaining}d)</td>
+            <td class="p-3 text-gray-400 font-mono text-[11px]">${expiryDateFormatted} <span class="text-cyan-400 font-bold">(${u.daysRemaining}d)</span></td>
             <td class="p-3">
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${badgeColor}">${u.status}</span>
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold border inline-block ${badgeColor}">${statusLabel}</span>
             </td>
             <td class="p-3">
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
                     <button onclick="adminViewUser('${u.id}')" title="تفصیلات" class="px-2 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-[10px] transition cursor-pointer">
                         VIEW
                     </button>
                     ${u.status !== 'ACTIVE' ? `
-                    <button onclick="adminActivateUser('${u.id}')" title="فعال کریں" class="px-2 py-1 bg-emerald-600/80 hover:bg-emerald-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        Activate Subscription
+                    <button onclick="adminActivateUser('${u.id}')" title="اکاؤنٹ فعال کر کے ایکسس دیں" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded text-[10px] transition cursor-pointer shadow">
+                        ✅ ایکسس دیں (ACTIVATE)
                     </button>` : ''}
                     ${u.status !== 'BLOCKED' ? `
-                    <button onclick="adminBlockUser('${u.id}')" title="بلاک کریں" class="px-2 py-1 bg-red-600/80 hover:bg-red-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        BLOCK
+                    <button onclick="adminBlockUser('${u.id}')" title="فوری طور پر صارف کی رسائی بلاک کریں" class="px-2.5 py-1 bg-red-600/90 hover:bg-red-600 text-white font-bold rounded text-[10px] transition cursor-pointer">
+                        🚫 بلاک کریں (BLOCK)
                     </button>` : `
-                    <button onclick="adminUnblockUser('${u.id}')" title="ان بلاک کریں" class="px-2 py-1 bg-cyan-600/80 hover:bg-cyan-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        UNBLOCK
+                    <button onclick="adminUnblockUser('${u.id}')" title="بلاک ختم کر کے رسائی بحال کریں" class="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-[10px] transition cursor-pointer">
+                        🔓 ان بلاک کریں (UNBLOCK)
                     </button>`}
-                    <button onclick="adminOpenExtendModal('${u.id}')" title="سبسکرپشن بڑھائیں" class="px-2 py-1 bg-purple-600/80 hover:bg-purple-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        EXTEND
+                    <button onclick="adminOpenExtendModal('${u.id}')" title="سبسکرپشن کے دن بڑھائیں" class="px-2 py-1 bg-purple-700/80 hover:bg-purple-600 text-white rounded text-[10px] transition cursor-pointer">
+                        ⏳ دن بڑھائیں
                     </button>
-                    <button onclick="adminOpenEditModal('${u.id}')" title="تبدیل کریں" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
-                        EDIT
+                    <button onclick="adminOpenEditModal('${u.id}')" title="ایڈٹ کریں" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
+                        ✏️ ایڈٹ
                     </button>
-                    <button onclick="adminDeleteUser('${u.id}')" title="ڈیلیٹ کریں" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500/50 text-red-300 rounded text-[10px] transition cursor-pointer">
-                        DELETE
+                    <button onclick="adminDeleteUser('${u.id}')" title="مستقل ڈیلیٹ کریں" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500/40 text-red-300 rounded text-[10px] transition cursor-pointer">
+                        🗑️
                     </button>
                 </div>
             </td>
@@ -1053,20 +1087,20 @@ function renderAdminUsersTable(users) {
 }
 
 async function adminActivateUser(userId) {
-    if (!confirm('کیا آپ واقعی اس صارف کا سبسکرپشن فعال کرنا چاہتے ہیں؟')) return;
+    if (!confirm('کیا آپ واقعی اس صارف کو فوری ایکسس دے کر فعال (ACTIVATE) کرنا چاہتے ہیں؟')) return;
     try {
-        const res = await fetch(`/api/admin/users/${userId}/activate`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/activate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({})
         });
         if (res.ok) {
-            showToast("سبسکرپشن کامیابی سے فعال ہو گیا!");
+            showToast("صارف کامیابی سے فعال (Active) کر دیا گیا!");
             loadAdminStats();
             loadAdminUsers();
         } else {
-            const d = await res.json();
-            alert(d.error);
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ایکٹیویشن ناکام ہو گئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1074,16 +1108,19 @@ async function adminActivateUser(userId) {
 }
 
 async function adminBlockUser(userId) {
-    if (!confirm('کیا آپ واقعی اس صارف کو بلاک کرنا چاہتے ہیں؟ اس کی تمام AI جنریشن فوری بند ہو جائے گی۔')) return;
+    if (!confirm('کیا آپ واقعی اس صارف کو بلاک (BLOCK) کرنا چاہتے ہیں؟ اس کی تمام AI جنریشن اور ٹول رسائی فوری بند ہو جائے گی۔')) return;
     try {
-        const res = await fetch(`/api/admin/users/${userId}/block`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/block`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف بلاک کر دیا گیا!");
+            showToast("صارف کو بلاک (Blocked) کر دیا گیا!");
             loadAdminStats();
             loadAdminUsers();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'بلاک کرنے میں خرابی پیش آئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1092,14 +1129,17 @@ async function adminBlockUser(userId) {
 
 async function adminUnblockUser(userId) {
     try {
-        const res = await fetch(`/api/admin/users/${userId}/unblock`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/unblock`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف ان بلاک کر دیا گیا!");
+            showToast("صارف کی رسائی بحال (Unblocked) کر دی گئی!");
             loadAdminStats();
             loadAdminUsers();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ان بلاک کرنے میں خرابی پیش آئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1109,14 +1149,17 @@ async function adminUnblockUser(userId) {
 async function adminDeleteUser(userId) {
     if (!confirm('کیا آپ واقعی اس صارف کو مستقل طور پر حذف کرنا چاہتے ہیں؟')) return;
     try {
-        const res = await fetch(`/api/admin/users/${userId}`, {
+        const res = await apiFetch(`/api/admin/users/${userId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف ڈیلیٹ کر دیا گیا!");
+            showToast("صارف کامیابی سے ڈیلیٹ کر دیا گیا!");
             loadAdminStats();
             loadAdminUsers();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ڈیلیٹ کرنے میں خرابی پیش آئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1188,7 +1231,7 @@ async function adminSubmitExtend(e) {
     const days = parseInt(document.getElementById('adminExtendDays').value, 10);
 
     try {
-        const res = await fetch(`/api/admin/users/${userId}/extend`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/extend`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({ days })
@@ -1199,8 +1242,8 @@ async function adminSubmitExtend(e) {
             loadAdminStats();
             loadAdminUsers();
         } else {
-            const d = await res.json();
-            alert(d.error);
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'دن بڑھانے میں خرابی');
         }
     } catch (err) {
         alert(err.message);
@@ -1237,7 +1280,7 @@ async function adminSubmitEditUser(e) {
     const password = document.getElementById('adminEditPassword').value;
 
     try {
-        const res = await fetch(`/api/admin/users/${userId}`, {
+        const res = await apiFetch(`/api/admin/users/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({
@@ -1256,8 +1299,8 @@ async function adminSubmitEditUser(e) {
             loadAdminStats();
             loadAdminUsers();
         } else {
-            const d = await res.json();
-            alert(d.error);
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ایڈٹ ناکام ہو گیا');
         }
     } catch (err) {
         alert(err.message);
@@ -1360,7 +1403,7 @@ function closeScreenshotModal() {
 async function adminVerifyPayment(paymentId) {
     if (!confirm('کیا آپ واقعی اس ادائیگی کی تصدیق کر کے صارف کا اکاؤنٹ فعال کرنا چاہتے ہیں؟\n\n- Monthly Plan: +30 Days\n- 6 Months Plan: +6 Calendar Months')) return;
     try {
-        const res = await fetch(`/api/admin/payments/${paymentId}/verify`, {
+        const res = await apiFetch(`/api/admin/payments/${paymentId}/verify`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -1368,6 +1411,9 @@ async function adminVerifyPayment(paymentId) {
             showToast("✓ Payment Approved! صارف کا اکاؤنٹ کامیابی سے فعال ہو گیا۔");
             loadAdminStats();
             loadAdminPayments();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ادائیگی کی تصدیق ناکام');
         }
     } catch (err) {
         alert(err.message);
@@ -1377,7 +1423,7 @@ async function adminVerifyPayment(paymentId) {
 async function adminRejectPayment(paymentId) {
     if (!confirm('کیا آپ واقعی یہ ادائیگی مسترد کرنا چاہتے ہیں؟ اس صارف کا اکاؤنٹ بند رہے گا۔')) return;
     try {
-        const res = await fetch(`/api/admin/payments/${paymentId}/reject`, {
+        const res = await apiFetch(`/api/admin/payments/${paymentId}/reject`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -1385,6 +1431,9 @@ async function adminRejectPayment(paymentId) {
             showToast("✕ Payment Rejected! ادائیگی مسترد کر دی گئی۔");
             loadAdminStats();
             loadAdminPayments();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ادائیگی مسترد کرنے میں خرابی');
         }
     } catch (err) {
         alert(err.message);
@@ -1424,6 +1473,9 @@ async function loadAdminSettings() {
         if (document.getElementById('setRateLimit')) {
             document.getElementById('setRateLimit').value = s.rate_limit_per_hour || '60';
         }
+        if (document.getElementById('setGroqApiKey')) {
+            document.getElementById('setGroqApiKey').value = s.groq_api_key || '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';
+        }
     } catch (_) {}
 }
 
@@ -1437,7 +1489,8 @@ async function adminSaveSettings(e) {
         plan_monthly_price: document.getElementById('setMonthlyPrice')?.value || '3000',
         plan_6months_price: document.getElementById('set6MonthsPrice')?.value || '15000',
         plan_annual_price: document.getElementById('setAnnualPrice')?.value || '25000',
-        rate_limit_per_hour: document.getElementById('setRateLimit')?.value || '60'
+        rate_limit_per_hour: document.getElementById('setRateLimit')?.value || '60',
+        groq_api_key: document.getElementById('setGroqApiKey')?.value || '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'
     };
 
     try {
@@ -1495,31 +1548,71 @@ async function loadAdminAuditLogs() {
     }
 }
 
-</script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&family=Pricedown&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        gta: {
-                            pink: '#FF007F',
-                            cyan: '#00F0FF',
-                            purple: '#7928CA',
-                            yellow: '#FFDD00',
-                            dark: '#080A10',
-                            card: '#101422',
-                            border: '#1E2638'
-                        }
-                    },
-                    fontFamily: {
-                        urdu: ['"Noto Nastaliq Urdu"', 'serif'],
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
-                    }
-                }
+// ============================================================
+// ADMIN BACKUP & RESTORE UTILITIES
+// ============================================================
+
+async function adminExportBackup() {
+    try {
+        showToast("بیک اپ تیار ہو رہا ہے...");
+        const res = await apiFetch('/api/admin/export-data', {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) throw new Error('بیک اپ ایکسپورٹ ناکام ہو گیا');
+        const data = await res.json();
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `global_generator_users_backup_${new Date().toISOString().substring(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast("✅ بیک اپ فائل کامیابی سے ڈاؤن لوڈ ہو گئی!");
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+async function adminImportBackup() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const json = JSON.parse(text);
+            
+            if (!confirm(`کیا آپ واقعی اس فائل (${file.name}) سے تمام صارفین اور ڈیٹا بحال (RESTORE) کرنا چاہتے ہیں؟`)) return;
+            
+            showToast("ڈیٹا سرور پر بھیجا جا رہا ہے...");
+            const res = await apiFetch('/api/admin/import-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                body: JSON.stringify(json)
+            });
+            
+            const result = await res.json();
+            if (res.ok) {
+                showToast(`✅ ${result.importedUsers || 'تمام'} صارفین کامیابی سے بحال ہو گئے!`);
+                loadAdminStats();
+                loadAdminUsers();
+            } else {
+                alert(result.error || 'بحالی ناکام ہو گئی');
             }
+        } catch (err) {
+            alert('غلط بیک اپ فائل یا پروسیسنگ خرابی: ' + err.message);
         }
-    </script>
+    };
+    input.click();
+}
+
+</script>
     <style>
         body {
             background-color: #06080e;
@@ -1704,17 +1797,15 @@ async function loadAdminAuditLogs() {
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-gray-400 mb-1">ویڈیو کا دورانیہ (Duration)</label>
+                        <label class="block font-semibold text-gray-400 mb-1">پرامپٹس / سینز کی مطلوبہ تعداد (Prompt & Scene Count)</label>
                         <select id="durationSelect" class="w-full bg-black/60 border border-gta-border rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-pink-500">
-                            <option value="30">30 سیکنڈز (3 سینز)</option>
-                            <option value="60" selected>1 منٹ (6 سینز)</option>
-                            <option value="120">2 منٹ (12 سینز)</option>
-                            <option value="180">3 منٹ (18 سینز)</option>
-                            <option value="300">5 منٹ (30 سینز)</option>
-                            <option value="480">8 منٹ (48 سینز)</option>
-                            <option value="600">10 منٹ (60 سینز - مکمل شارٹ مووی) 🔥</option>
-                            <option value="720">12 منٹ (72 سینز - فل سنیماٹک ساگا) 🌟</option>
-                            <option value="900">15 منٹ (90 سینز - میگا اوپن ورلڈ فلم) 🎬</option>
+                            <option value="5">5 پرامپٹس (5 سینز - 50 سیکنڈز ریلز / شارٹس)</option>
+                            <option value="10">10 پرامپٹس (10 سینز - 1.5 منٹ ویڈیو)</option>
+                            <option value="20">20 پرامپٹس (20 سینز - 3 منٹ ویڈیو)</option>
+                            <option value="30">30 پرامپٹس (30 سینز - 5 منٹ ایپیسوڈ)</option>
+                            <option value="60" selected>60 پرامپٹس (60 سینز - مکمل شارٹ مووی 10 منٹ) 🔥</option>
+                            <option value="90">90 پرامپٹس (90 سینز - میگا سنیماٹک فلم 15 منٹ) 🎬</option>
+                            <option value="120">120 پرامپٹس (120 سینز - الٹرا ویب سیریز 20 منٹ) 🌟</option>
                         </select>
                     </div>
 
@@ -2316,16 +2407,89 @@ async function loadAdminAuditLogs() {
         let currentData = null;
         let currentTab = 'all';
 
+        function formatTimestampRange(i) {
+            const startSec = i * 10;
+            const endSec = (i + 1) * 10;
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${pad(Math.floor(startSec / 60))}:${pad(startSec % 60)} - ${pad(Math.floor(endSec / 60))}:${pad(endSec % 60)}`;
+        }
+
         // ============================================================
-        // DYNAMIC CHARACTER GENERATION ENGINE
-        // Adapts intelligently to topic: 1 (solo), 2 (duo), 3+ (crew)
+        // DYNAMIC CHARACTER GENERATION ENGINE (Locked DNA & Wardrobe)
         // ============================================================
         function getDynamicCharactersForTopic(topic) {
             const t = (topic || '').toLowerCase();
-            const isSolo = t.includes('سولو') || t.includes('اکیلا') || t.includes('اکیلی') || t.includes('lone') || t.includes('solo') || t.includes('assassin') || t.includes('hitman') || t.includes('detective') || t.includes('agent') || t.includes('sniper');
-            const isCrew = t.includes('کرو') || t.includes('crew') || t.includes('گینگ') || t.includes('gang') || t.includes('ٹیم') || t.includes('team') || t.includes('trio') || t.includes('3') || t.includes('تین') || t.includes('چار') || t.includes('heist') || t.includes('ڈکیتی');
 
-            if (isSolo && !isCrew) {
+            if (t.includes('مغل') || t.includes('تاریخ') || t.includes('بادشاہ') || t.includes('قلعہ') || t.includes('جنگجو') || t.includes('sword') || t.includes('historical') || t.includes('warrior') || t.includes('ottoman') || t.includes('sultan')) {
+                return [
+                    {
+                        name: "Hamza Khan (حمزہ خان)",
+                        role: "شاہی کمانڈر و شمشیر زن (Royal Mughal Commander)",
+                        age: "34 سال",
+                        gender: "مردانہ (Male)",
+                        body: "مضبوط کسرتی جسم، 6 فٹ قد، گندمی رنگت، فولادی جبڑا اور پرعزم نگاہیں",
+                        facialFeatures: "گھنی تراشی ہوئی سیاہ داڑھی، تیکھی ناک، گہری عقابی بھوری آنکھیں، ماتھے پر ہلکا جنگی نشان",
+                        clothing: "گہرے نیوی بلیو اور زیتونی سلک کا شاہی انگورکھا، سینے پر دمشقی اسٹیل کا سنہری کندہ شدہ زرہ بکتر، کمر پر زری والا کٹار پٹکا اور براؤن لیدر بوٹس",
+                        dnaLockToken: "[LOCKED_DNA_HAMZA: 34yo warrior, olive/navy silk angarkha, Damascus steel chest armor, trimmed dark beard, eagle eyes, zero morphing]"
+                    },
+                    {
+                        name: "Zoya Bano (زویا بانو)",
+                        role: "شاہی انٹیلیجنس مشیر و تیر انداز (Royal Strategist)",
+                        age: "28 سال",
+                        gender: "زنانہ (Female)",
+                        body: "چست ایتھلیٹک جسم، 5 فٹ 7 انچ، شہدی رنگت اور شاہانہ وقار",
+                        facialFeatures: "لمبے سیاہ ریشمی بال، تیکھی چمکدار آنکھیں، چہرے پر باریک شاہی نقاب اور پروقار مسکراہٹ",
+                        clothing: "گہرے قرمزی ریشم کا کڑھائی دار قمیض شلوار، کندھے پر چمڑے کا تیر دان، کمر پر سونے کا پٹکا اور مخملی جوتے",
+                        dnaLockToken: "[LOCKED_DNA_ZOYA: 28yo female, crimson embroidered silk attire, royal archer quiver, sharp amber eyes, zero morphing]"
+                    }
+                ];
+            } else if (t.includes('سائبر') || t.includes('مستقبل') || t.includes('روبوٹ') || t.includes('cyber') || t.includes('sci-fi') || t.includes('future') || t.includes('neon') || t.includes('matrix')) {
+                return [
+                    {
+                        name: "Riven 'Ghost' Cross",
+                        role: "سائبر ٹیک انفلٹریٹر (Cyber Infiltrator)",
+                        age: "28 سال",
+                        gender: "مردانہ (Male)",
+                        body: "لچکدار ایتھلیٹک جسم، 5 فٹ 11 انچ، سنہری جلد اور تیز ریفلیکسز",
+                        facialFeatures: "شارٹ سلور سفید بال، دائیں کنپٹی پر گلوئنگ نیلی بائیو چپ، سرمئی آنکھیں اور تیکھا چہرہ",
+                        clothing: "میٹ بلیک نیوپرین ٹیکٹیکل لانگ جیکٹ مع الیکٹرو لیومنسنٹ وائلٹ پائپنگ، ہائی ٹیک ویسٹ اور واٹر پروف سائبر کمبیٹ بوٹس",
+                        dnaLockToken: "[LOCKED_DNA_RIVEN: 28yo male, silver undercut hair, matte black tactical jacket with violet piping, blue temple optic, zero morphing]"
+                    },
+                    {
+                        name: "Aria Vance",
+                        role: "سائبر ہیکر و سگنل انٹیل (Signal Specialist)",
+                        age: "26 سال",
+                        gender: "زنانہ (Female)",
+                        body: "پھرتیلی جسامت، 5 فٹ 7 انچ قد، روشن نیلی نگاہیں",
+                        facialFeatures: "جیٹ بلیک ایسیمیٹرک بوب کٹ، چہرے پر پرسکون فوکس، کان پر ہولوگرافک کمیونیکیٹر",
+                        clothing: "چارکول گرے ریفلیکٹیو ہوڈی، بلیک کارگو جوگرز، فنگر لیس ٹیکٹیکل دستانے اور ڈیٹا ہارڈ ڈرائیوز ہارنیس",
+                        dnaLockToken: "[LOCKED_DNA_ARIA: 26yo female, jet black bob, charcoal reflective hoodie, bright blue eyes, zero morphing]"
+                    }
+                ];
+            } else if (t.includes('کرو') || t.includes('crew') || t.includes('گینگ') || t.includes('gang') || t.includes('بینک') || t.includes('ڈکیتی') || t.includes('heist') || t.includes('robbery') || t.includes('gta')) {
+                return [
+                    {
+                        name: "Mateo Cruz",
+                        role: "ہائیسٹ ماسٹر مائنڈ (Mastermind Lead)",
+                        age: "35 سال",
+                        gender: "مردانہ (Male)",
+                        body: "چوڑے مضبوط کندھے، باوقار چال ڈھال، 6 فٹ قد اور گہری بھوری آنکھیں",
+                        facialFeatures: "سلکڈ بیک ڈارک ہیئر، باریک شیو، پرسکون مسکراہٹ اور الرٹ نگاہیں",
+                        clothing: "ڈارک چارکول سلک لینن سوٹ جیکٹ، اندر کالی ٹی شرٹ، کیولر کنسیلڈ ویسٹ، لیدر ڈرائیونگ گلوز اور لگژری واچ",
+                        dnaLockToken: "[LOCKED_DNA_MATEO: 35yo male, slicked dark hair, charcoal linen jacket, tactical inner vest, leather driving gloves, zero morphing]"
+                    },
+                    {
+                        name: "Lucia Santos",
+                        role: "ٹیکٹیکل پوائنٹ آپریٹو (Tactical Specialist)",
+                        age: "29 سال",
+                        gender: "زنانہ (Female)",
+                        body: "ایتھلیٹک ٹونڈ باڈی، لاطینی گندمی رنگت، 5 فٹ 8 انچ قد",
+                        facialFeatures: "ہائی پونی ٹیل سیاہ بال، تیکھے گال کی ہڈیاں، ہیزل آنکھیں مع پرعزم تاثر",
+                        clothing: "کریمسن ریڈ ٹیکٹیکل فارم فٹنگ جیکٹ، بلیک ریپ اسٹاپ کارگو پینٹس، ٹیکٹیکل تھائی ہولسٹر اور کمبیٹ بوٹس",
+                        dnaLockToken: "[LOCKED_DNA_LUCIA: 29yo female, high black ponytail, crimson tactical jacket, hazel eyes, tactical holster, zero morphing]"
+                    }
+                ];
+            } else if (t.includes('سولو') || t.includes('اکیلا') || t.includes('اکیلی') || t.includes('lone') || t.includes('solo') || t.includes('assassin') || t.includes('hitman') || t.includes('sniper')) {
                 return [
                     {
                         name: "Marcus 'Ghost' Vance",
@@ -2335,132 +2499,247 @@ async function loadAdminAuditLogs() {
                         body: "مضبوط لچکدار ایتھلیٹک جسم، 6 فٹ 1 انچ قد، تیز فولادی سرمئی آنکھیں اور تیکھا جبڑا",
                         facialFeatures: "شارٹ ملٹری فیڈ سیاہ بال، بائیں بھنو پر ہلکا ٹیکٹیکل نشان، پرعزم و بے خوف تاثر",
                         clothing: "میٹ بلیک ٹیکٹیکل ٹرٹل نیک شرٹ، کسٹم کیولر کنسیلمنٹ رگ، ڈارک کارگو ٹراؤزرز اور واٹر پروف کمبیٹ بوٹس",
-                        dnaLockToken: "LOCKED_CHAR_GHOST_SOLO [32yo male, athletic tactical build, matte black turtleneck, steel grey eyes, locked facial features, zero morphing]"
-                    }
-                ];
-            } else if (isCrew) {
-                return [
-                    {
-                        name: "Mateo Cruz",
-                        role: "ماسٹر مائنڈ و ٹیکٹیکل لیڈر (Heist Mastermind)",
-                        age: "35 سال",
-                        gender: "مردانہ (Male)",
-                        body: "چوڑے مضبوط کندھے، پرسکون اور باوقار باڈی لینگویج، 6 فٹ قد، سنہری بھوری آنکھیں",
-                        facialFeatures: "سلکڈ بیک سیاہ بال، باریک تراشی ہوئی داڑھی، تیکھی ناک اور الرٹ نگاہیں",
-                        clothing: "چارکول گرے اوپن کالر لینن شرٹ، اندر سفید ویسٹ، ہائی ٹیک گھڑی اور ہولسٹر",
-                        dnaLockToken: "LOCKED_CHAR_MATEO [35yo male, broad shoulders, slicked dark hair, charcoal linen shirt, amber eyes, zero morphing]"
-                    },
-                    {
-                        name: "Elena 'Cipher' Rostova",
-                        role: "سائبر و مین فریم ہیکر (Cyber Specialist)",
-                        age: "27 سال",
-                        gender: "زنانہ (Female)",
-                        body: "دبلی پتلی پھرتیلی جسامت، 5 فٹ 7 انچ، گوری رنگت اور روشن نیلی آنکھیں",
-                        facialFeatures: "پلاٹینم بلونڈ شارٹ بوب ہیئر کٹ، کان میں ہولوگرافک بائیو میٹرک ڈیوائس",
-                        clothing: "ڈارک وائلٹ سائبر بمبر جیکٹ، بلیک ریبڈ ٹاپ، ٹیکٹیکل کارگو جوگرز مع ڈیٹا کیبلز",
-                        dnaLockToken: "LOCKED_CHAR_ELENA [27yo female, platinum blonde bob, violet bomber jacket, vivid blue eyes, zero morphing]"
-                    },
-                    {
-                        name: "Dante 'Apex' Silva",
-                        role: "ہائی اسپیڈ گیٹ وے ڈرائیور (Getaway Specialist)",
-                        age: "29 سال",
-                        gender: "مردانہ (Male)",
-                        body: "ایتھلیٹک اسپرنٹر باڈی، گندمی رنگت، گہری شہدی آنکھیں اور تیز ردعمل",
-                        facialFeatures: "کلوز بز کٹ، چہرے پر پرجوش مسکراہٹ، گردن پر ٹرائبل ریسنگ ٹیٹو",
-                        clothing: "ونٹیج گرافک اوور سائزڈ ریسنگ جرسی، ڈارک ڈینم، لیدر ڈرائیونگ گلوز اور اسپورٹس جوتے",
-                        dnaLockToken: "LOCKED_CHAR_DANTE [29yo male, buzzcut, vintage racing jersey, driving gloves, hazel eyes, zero morphing]"
+                        dnaLockToken: "[LOCKED_DNA_MARCUS: 32yo male, athletic tactical build, matte black turtleneck, steel grey eyes, zero morphing]"
                     }
                 ];
             } else {
-                // Dynamic Duo
                 return [
                     {
-                        name: "Lucia Santos",
-                        role: "لیڈ انفلٹریٹر و ڈرائیور (Lead Infiltrator)",
-                        age: "28 سال",
-                        gender: "زنانہ (Female)",
-                        body: "ایتھلیٹک فٹ باڈی، لاطینی گندمی رنگت، تیکھے خدوخال اور گہری پرکشش بھوری آنکھیں",
-                        facialFeatures: "لمبے سیاہ بال جو پونی ٹیل میں بندھے ہیں، ہوا میں اڑتی لٹیں اور کانوں میں گولڈن ہوپ بالیاں",
-                        clothing: "کریمسن ریڈ ہالٹر نیک ٹاپ، رف ٹیکٹیکل ڈینم شارٹس، لیدر گن ہولسٹر اور بلیک کمبیٹ بوٹس",
-                        dnaLockToken: "LOCKED_CHAR_LUCIA [28yo female, athletic toned Latina build, crimson red halter top, raven black ponytail, brown eyes, zero morphing]"
-                    },
-                    {
-                        name: "Jason Vance",
-                        role: "ٹیکٹیکل پوائنٹ مین و شوٹر (Tactical Specialist)",
+                        name: "Zain Malik (زین ملک)",
+                        role: "لیڈ انویسٹیگیٹر و آپریٹو (Lead Operative)",
                         age: "31 سال",
                         gender: "مردانہ (Male)",
-                        body: "مضبوط کسرتی جسم، دھوپ سے تپی رنگت، نمایاں جبڑا مع 3 دن کی شیو، ہلکی ہیزل آنکھیں",
-                        facialFeatures: "شارٹ ملٹری فیڈ سینڈی براؤن بال، الرٹ اور پرسکون آنکھیں",
-                        clothing: "ونٹیج فیروزی (Turquoise) کیوبن اوپن کالر شرٹ، اندر سفید ٹینک ٹاپ، ملٹری کارگو پینٹس اور ایوی ایٹر چشمہ",
-                        dnaLockToken: "LOCKED_CHAR_JASON [31yo male, muscular athletic build, turquoise Cuban shirt, white tank top, hazel eyes, zero morphing]"
+                        body: "مضبوط کسرتی جسم، 6 فٹ 1 انچ، گندمی رنگت اور تیز مشاہدہ",
+                        facialFeatures: "شارٹ ملٹری فیڈ سیاہ بال، ہلکی شیو، گہری امبر بھوری آنکھیں اور پرعزم انداز",
+                        clothing: "زیتونی سبز ٹیکٹیکل فیلڈ جیکٹ، اندر ڈارک گرے ہینلی شرٹ، کسٹم کیولر ہولسٹر، ڈارک ڈینم اور کمبیٹ بوٹس",
+                        dnaLockToken: "[LOCKED_DNA_ZAIN: 31yo male, military fade hair, olive green tactical field jacket, amber eyes, combat boots, zero morphing]"
+                    },
+                    {
+                        name: "Maya Lin (مایا لن)",
+                        role: "سائبر و ٹیکٹیکل کوآرڈینیٹر (Tactical Coordinator)",
+                        age: "27 سال",
+                        gender: "زنانہ (Female)",
+                        body: "ایتھلیٹک سمارٹ جسامت، 5 فٹ 8 انچ، الرٹ نگاہیں",
+                        facialFeatures: "سلک ڈارک براؤن بال جو سائیڈ بینگز میں کٹے ہیں، ہائی ٹیک ایئر پیس، تیز مشاہدہ",
+                        clothing: "میٹ نیوی کارگو بمبر، اندر ڈارک ٹیکٹیکل ٹاپ، کنسیلڈ ہولسٹر اور کمبیٹ اسنیکرز",
+                        dnaLockToken: "[LOCKED_DNA_MAYA: 27yo female, dark brown side-bang hair, navy tactical bomber, smart comms earpiece, zero morphing]"
                     }
                 ];
             }
         }
 
         // ============================================================
-        // ZERO-FAILURE OFFLINE BLUEPRINT GENERATOR
-        // (100% Valid Prompts for Kling, Runway, Luma, Midjourney v6)
+        // ZERO-FAILURE OFFLINE BLUEPRINT GENERATOR (Guaranteed N Prompts)
         // ============================================================
         function generateOfflineBlueprint(topic, lang, duration, style, camera) {
-            const sceneCount = Math.max(3, Math.round(duration / 10));
+            let count = parseInt(duration || 60, 10);
+            if (count === 600) count = 60;
+            if (count === 900) count = 90;
+            if (count === 720) count = 72;
+            if (count === 480) count = 48;
+            if (count === 300) count = 30;
+            if (count === 180) count = 18;
+            if (count === 120) count = 12;
+            const sceneCount = Math.min(120, Math.max(3, count));
+
             const characters = getDynamicCharactersForTopic(topic);
             const mainChar = characters[0];
             const secChar = characters.length > 1 ? characters[1] : null;
+            const t = (topic || '').toLowerCase();
+
+            let envName = 'Atmospheric perimeter with architectural glass and high-rise skyline view';
+            let envDetails = 'cinematic sunset golden hour, dramatic shadows, anamorphic lens flares, 8K ultra-detailed environment';
+
+            if (t.includes('مغل') || t.includes('تاریخ') || t.includes('بادشاہ') || t.includes('قلعہ') || t.includes('جنگجو') || t.includes('sword') || t.includes('historical') || t.includes('warrior')) {
+                envName = '16th-century grand Mughal fortress courtyard and ornate red sandstone battlements';
+                envDetails = 'flickering brass torchlight, royal Persian carpets, intricately carved marble archways, dusty golden sunlight';
+            } else if (t.includes('سائبر') || t.includes('مستقبل') || t.includes('cyber') || t.includes('sci-fi') || t.includes('future') || t.includes('neon')) {
+                envName = 'Rain-drenched Neo-Tokyo megacity alleyways and holographic corporate spire';
+                envDetails = 'vivid magenta and cyan neon tube reflections, puddles on dark asphalt, towering volumetric holographic billboards';
+            } else if (t.includes('بینک') || t.includes('ڈکیتی') || t.includes('heist') || t.includes('robbery') || t.includes('vault') || t.includes('gta')) {
+                envName = 'Subterranean reinforced titanium bank vault and marble atrium floor';
+                envDetails = 'gleaming polished white marble, red laser security tripwires, dim green emergency backup lights, alarm strobe pulses';
+            }
+
+            const cameraMovements = [
+                "Low-angle cinematic tracking push shot at 60fps, 35mm anamorphic lens",
+                "Dynamic over-the-shoulder steadycam orbit moving at rapid pace",
+                "Intense whip-pan tracking hero shot, dramatic Dutch angle with depth-of-field blur",
+                "Slow-motion 120fps dolly zoom revealing tense facial expressions and tactical gear",
+                "Cinematic macro close-up on focused eyes and weapon/gadget handling",
+                "Wide-angle cinematic crane jib pull-back shot with golden volumetric rays",
+                "Visceral handheld POV camera with realistic micro-shake and motion blur",
+                "High-speed shutter motion tracking pan keeping the operative in razor-sharp focus",
+                "Bird's-eye aerial top-down sweep rotating 360 degrees above the perimeter",
+                "Symmetrical cinematic master shot with volumetric rim flare and anamorphic bokeh"
+            ];
+
+            const narrativePhases = [
+                {
+                    act: "Act I: Covert Inception & Perimeter Arrival",
+                    titleUrdu: "شروعات، آمد اور ماحول کا جائزہ",
+                    actions: [
+                        "infiltrates the perimeter quietly, surveying the perimeter landscape while checking tactical equipment",
+                        "holds position behind cover, scanning the environment for security patrols and temporal blindspots"
+                    ],
+                    dialogues: [
+                        "Perimeter secured. Coordinates locked. Proceeding according to master blueprint.",
+                        "Visual telemetry clear. Keep radio silence until we reach checkpoint Alpha."
+                    ]
+                },
+                {
+                    act: "Act II: Tactical Breach & Security Override",
+                    titleUrdu: "بیرونی رکاوٹ عبور اور سیکیورٹی بائی پاس",
+                    actions: [
+                        "executes precision electronic bypass on the perimeter gate, sparks dancing off the terminal",
+                        "signals low and maneuvers through the shadow corridor, matching movement to the rhythmic strobe pulse"
+                    ],
+                    dialogues: [
+                        "Bypassing perimeter defenses. 10 seconds to full override.",
+                        "Grid is down. We have an eight-minute window. Advance now."
+                    ]
+                },
+                {
+                    act: "Act III: Deep Penetration & Subterranean Infiltration",
+                    titleUrdu: "گہری پیش قدمی اور اندرونی راستوں کا انتظام",
+                    actions: [
+                        "descends into the inner complex corridor, shadows lengthening dramatically along the walls",
+                        "crouches beside reinforced pillar as an automated scanning beam washes over the floor inches away"
+                    ],
+                    dialogues: [
+                        "Descending to sub-level four. Gravity sensors are active.",
+                        "Stay out of the light sweep. Two paces behind me."
+                    ]
+                },
+                {
+                    act: "Act IV: The Discovery & Intelligence Acquisition",
+                    titleUrdu: "مرکزی ہدف کی دریافت اور خفیہ رازوں کا انکشاف",
+                    actions: [
+                        "reaches the grand central chamber, eyes fixing upon the luminous target resting in the reinforced chamber",
+                        "initiates high-speed optical download, holographic numerals reflecting across focused pupils"
+                    ],
+                    dialogues: [
+                        "Visual confirmation on the prize. It's fully intact.",
+                        "Data extraction initiating. Stand by for cryptographic decryption."
+                    ]
+                },
+                {
+                    act: "Act V: The Complication & Alarm Trigger",
+                    titleUrdu: "ناگہانی خطرہ، الارم اور سائرن کی گونج",
+                    actions: [
+                        "reacts instantly as red emergency warning strobes bathe the chamber in pulsing crimson light",
+                        "snaps into dynamic low cover as heavy blast doors seal off the main exit with an echoing crash"
+                    ],
+                    dialogues: [
+                        "Alarm triggered! Lockdown initiated on all outer bulkheads!",
+                        "They knew we were coming. Plan Bravo is now in effect!"
+                    ]
+                },
+                {
+                    act: "Act VI: High-Stakes Tactical Crossfire & Skirmish",
+                    titleUrdu: "شدید تصادم اور حکمت عملی کے ساتھ جوابی کارروائی",
+                    actions: [
+                        "unleashes rapid tactical suppression fire, muzzle flashes cutting through the swirling smoke",
+                        "deploys a dense tactical smoke canister, masking movement while advancing through the haze"
+                    ],
+                    dialogues: [
+                        "Suppression fire! Keep them pinned while I flank the left corridor!",
+                        "Covering your advance! Smoke out, move now!"
+                    ]
+                },
+                {
+                    act: "Act VII: The Turning Point & Decisive Confrontation",
+                    titleUrdu: "فیصلہ کن موڑ اور مرکزی رکاوٹ کا خاتمہ",
+                    actions: [
+                        "confronts the elite adversary commander in a high-tension standoff, eyes narrowing with steely resolve",
+                        "detonates breach charges on the reinforcement wall, blasting open a pathway to the outdoor courtyard"
+                    ],
+                    dialogues: [
+                        "It ends here! Stand down or face the consequences!",
+                        "Path is cleared! Sprint for the open sky!"
+                    ]
+                },
+                {
+                    act: "Act VIII: The High-Speed Breakout & Pursuit",
+                    titleUrdu: "تیز رفتار فرار اور چھتوں / گاڑیوں پر تعاقب",
+                    actions: [
+                        "bursts through shattered glass onto the elevated open balcony, sprinting full speed against the wind",
+                        "engages high-speed pursuit vehicle, tires screeching across wet pavement as sparks erupt"
+                    ],
+                    dialogues: [
+                        "Breaking out onto the upper terrace! Extraction team, where are you?!",
+                        "Vehicle engaged! Hold on, this is going to be rough!"
+                    ]
+                },
+                {
+                    act: "Act IX: Aerial / Tactical Extraction & Payoff",
+                    titleUrdu: "حتمی انخلاء اور محفوظ زون میں داخلہ",
+                    actions: [
+                        "latches onto the dangling extraction cable as rescue transport roars overhead against the dusk sky",
+                        "pulls inside the transport compartment, extending a hand to secure the partner amidst rushing wind"
+                    ],
+                    dialogues: [
+                        "Extraction transport is here! Hook in, hook in now!",
+                        "We are airborne and out of hostile range. Clean extraction confirmed."
+                    ]
+                },
+                {
+                    act: "Act X: Climax Payoff, Golden Sunset & Final Resolution",
+                    titleUrdu: "عظیم الشان انجام، فتح اور مستقل شناخت کا تاثر",
+                    actions: [
+                        "stands tall in the open cabin bay as golden twilight sunlight illuminates the triumphant silhouette",
+                        "exchanges a knowing nod with the team as city lights illuminate beneath the cinematic panoramic frame"
+                    ],
+                    dialogues: [
+                        "Mission accomplished. The truth is now in our hands.",
+                        "Heading for home base. Over and out."
+                    ]
+                }
+            ];
 
             return {
                 topic,
                 lang,
-                duration,
+                duration: sceneCount,
                 sceneCount,
                 style,
                 camera,
                 characters,
-                storyUrdu: `یہ کہانی "${topic}" کے سنسنی خیز اور حقیقت پسندانہ ماحول میں ترتیب دی گئی ہے۔ کہانی میں کردار اپنے مخصوص پیشہ ورانہ کردار، قطعی بصری شناخت اور مستقل لباس کے ساتھ ایک منظم مشن کو مرحلہ وار انجام دیتے ہیں۔ ہر منظر کو کیمرہ اینگل، روشنی اور سنیماٹک حرکات کے عین مطابق ترتیب دیا گیا ہے تاکہ ہر AI ویڈیو اور امیج ٹول پر بہترین اور نقص سے پاک نتائج مل سکیں۔`,
+                storyUrdu: `یہ کہانی "${topic}" کے مکمل تسلسل، ربط اور منطقی بہاؤ کے ساتھ کل ${sceneCount} مناظر پر مشتمل تیار کی گئی ہے۔ اس میں ہر منظر کا اگلے منظر کے ساتھ مضبوط تعلق ہے، اور کردار کا لباس، رنگ، عمر، چہرہ اور ڈی این اے تمام مناظر میں 100% مستقل اور محفوظ ہے تاکہ AI ویڈیوز میں کوئی روپ تبدیل نہ ہو۔`,
                 scenes: Array.from({ length: sceneCount }, (_, i) => {
                     const sceneNum = i + 1;
-                    const startSec = i * 10;
-                    const endSec = (i + 1) * 10;
-                    const formatTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-                    const timestamp = `${formatTime(startSec)} - ${formatTime(endSec)}`;
+                    const timestamp = formatTimestampRange(i);
 
-                    const progressRatio = sceneNum / sceneCount;
-                    let actTitle = "Act I: Tactical Approach & Surveillance";
-                    let actionText = `${mainChar.name} (${mainChar.role}) executes precision tactical movement through the perimeter, scanning the environment`;
-                    let dialogue = `"Perimeter confirmed clear. Moving to primary objective."`;
+                    const phaseIndex = Math.min(narrativePhases.length - 1, Math.floor((i / sceneCount) * narrativePhases.length));
+                    const phase = narrativePhases[phaseIndex];
 
-                    if (progressRatio > 0.3 && progressRatio <= 0.6) {
-                        actTitle = "Act II: High-Stakes Breach & Infiltration";
-                        actionText = secChar 
-                            ? `${mainChar.name} and ${secChar.name} breach the inner vault corridor, overriding red laser sensors in synchrony`
-                            : `${mainChar.name} initiates silent data breach on the mainframe console, neon terminals reflecting on the visor`;
-                        dialogue = `"Firewall breached. Extraction window is 90 seconds."`;
-                    } else if (progressRatio > 0.6 && progressRatio <= 0.85) {
-                        actTitle = "Act III: High-Speed Evasive Pursuit";
-                        actionText = `High-speed evasive drift through wet neon highways, tires smoking on asphalt, police helicopter searchlights tracking from above`;
-                        dialogue = `"Full throttle, take the coastal bridge exit now!"`;
-                    } else if (progressRatio > 0.85) {
-                        actTitle = "Act IV: Extraction & Clean Getaway";
-                        actionText = `Speeding towards the ocean waterfront as dawn breaks over the skyline, making clean extraction into the morning mist`;
-                        dialogue = `"We made it. Mission complete, rendezvous point reached."`;
+                    const actionSubIdx = i % phase.actions.length;
+                    const dialogueSubIdx = i % phase.dialogues.length;
+                    const cameraMovement = cameraMovements[i % cameraMovements.length];
+
+                    const specificAction = phase.actions[actionSubIdx];
+                    const dialogue = phase.dialogues[dialogueSubIdx];
+
+                    const actTitle = `منظر ${sceneNum} / ${sceneCount}: ${phase.titleUrdu} (${phase.act})`;
+
+                    let actionText = "";
+                    if (secChar && (i % 2 === 1 || i % 3 === 0)) {
+                        actionText = `${mainChar.name} (${mainChar.dnaLockToken}) and ${secChar.name} (${secChar.dnaLockToken}), wearing their locked outfits, ${specificAction} in ${envName}`;
+                    } else {
+                        actionText = `${mainChar.name} (${mainChar.dnaLockToken}), wearing ${mainChar.clothing}, ${specificAction} in ${envName}`;
                     }
 
-                    // 1. Universal Video Prompt (Kling 1.5, Runway Gen-3, Luma, Sora, Minimax)
-                    const videoPrompt = `Photorealistic 8K cinematic shot, ${actionText}, ${camera} at 60fps, ${style}, volumetric atmospheric lighting, neon reflections on wet surface, anamorphic 35mm lens, hyper-detailed, masterpiece`;
-
-                    // 2. Midjourney v6.1 Keyframe Prompt
-                    const midjourneyPrompt = `Cinematic 8K movie still, ${actionText}, detailed wardrobe, photorealistic skin texture, dramatic lighting, shot on 35mm anamorphic lens, Unreal Engine 5.4, Rockstar RAGE Engine --ar 16:9 --style raw --v 6.1`;
-
-                    // 3. Universal Negative Prompt
-                    const negativePrompt = `blurry, low quality, morphing, deformed hands, extra limbs, distorted face, oversaturated, cartoon, CGI, 3d render, watermark, text, signature`;
+                    const videoPrompt = `${mainChar.name} in ${mainChar.clothing}, ${actionText}. ${cameraMovement}. ${envDetails}. photorealistic 8K, Unreal Engine 5.4 Lumen, 35mm lens, hyper-detailed`.substring(0, 440);
+                    const midjourneyPrompt = `${mainChar.name} in ${mainChar.clothing}, ${actionText}, ${envName}, ${envDetails}, shot on 35mm anamorphic lens, 8K ultra-detailed --ar 16:9 --style raw --v 6.1`;
+                    const negativePrompt = "blurry, low quality, morphing, deformed hands, extra limbs, distorted face, altered clothes, changed hair, watermark";
 
                     return {
                         number: sceneNum,
                         title: actTitle,
                         timestamp,
                         activeCharacters: characters.map(c => c.name),
-                        camera,
-                        lighting: "Volumetric neon rim lighting with wet surface raytracing",
+                        camera: cameraMovement,
+                        lighting: envDetails,
                         dialogue,
                         videoPrompt,
                         midjourneyPrompt,
@@ -2471,7 +2750,7 @@ async function loadAdminAuditLogs() {
         }
 
         // ============================================================
-        // GLOBAL AI ENGINE RUNNER (Calls Groq API or Smart Offline Engine)
+        // GLOBAL AI ENGINE RUNNER
         // ============================================================
         async function runGlobalEngine() {
             const topic = document.getElementById('topicInput').value.trim();
@@ -2525,6 +2804,7 @@ async function loadAdminAuditLogs() {
                             topic,
                             lang,
                             duration,
+                            sceneCount: duration,
                             style,
                             camera
                         })
@@ -2551,7 +2831,7 @@ async function loadAdminAuditLogs() {
                 }
 
                 if (aiData) {
-                    const sceneCount = Math.max(3, Math.round(duration / 10));
+                    const finalSceneCount = (aiData.scenes && aiData.scenes.length) ? aiData.scenes.length : duration;
 
                     // Normalize characters array
                     let charArray = [];
@@ -2567,7 +2847,7 @@ async function loadAdminAuditLogs() {
                         topic,
                         lang,
                         duration,
-                        sceneCount: (aiData.scenes && aiData.scenes.length) ? aiData.scenes.length : sceneCount,
+                        sceneCount: finalSceneCount,
                         style: aiData.style || style,
                         camera,
                         characters: charArray,
@@ -2575,7 +2855,7 @@ async function loadAdminAuditLogs() {
                         scenes: (aiData.scenes || []).map((s, idx) => ({
                             number: s.number || (idx + 1),
                             title: s.title || `Scene ${idx + 1}`,
-                            timestamp: s.timestamp || `${idx * 10}s - ${(idx + 1) * 10}s`,
+                            timestamp: s.timestamp || formatTimestampRange(idx),
                             activeCharacters: s.activeCharacters || charArray.map(c => c.name),
                             camera: s.camera || camera,
                             lighting: s.lighting || "Volumetric neon reflections, 8K raytracing",
@@ -2790,7 +3070,7 @@ async function loadAdminAuditLogs() {
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-pink-500/20 text-pink-400 border border-pink-500/30">MASTER PROMPT STUDIO</span>
                             <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">👥 ${d.characters.length} متحرک کردار</span>
-                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">⏱️ ${d.duration}s (${d.sceneCount} مناظر)</span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">🎬 ${d.sceneCount} مکمل مناظر و پرامپٹس (${Math.max(1, Math.round(d.sceneCount * 10 / 60))} منٹ مووی)</span>
                         </div>
                         <h3 class="text-sm font-bold text-white max-w-md truncate">${d.topic}</h3>
                     </div>
@@ -3678,6 +3958,12 @@ ${c.dnaLockToken || c.clothing}`
                         <div>
                             <label class="text-[10px] text-gray-400 block mb-1">ادائیگی کی ہدایات (Payment Instructions for Users)</label>
                             <textarea id="setPaymentInstructions" rows="2" class="w-full bg-black border border-white/10 rounded-lg p-2 text-xs text-white"></textarea>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                            <label class="text-[11px] text-amber-400 font-extrabold block mb-1">⚡ Groq Cloud LPU API Key (AI کہانی و پرامپٹ انجن)</label>
+                            <input id="setGroqApiKey" type="text" placeholder="gsk_..." class="w-full bg-black/80 border border-amber-500/50 rounded-lg p-2 text-xs text-amber-200 font-mono focus:border-amber-400 focus:outline-none" />
+                            <p class="text-[10px] text-gray-400 mt-1">سرور سائیڈ محفوظ کی (Never exposed to users). اگر آپ کے پاس اپنی Groq Key ہے تو یہاں درج کریں، ورنہ سسٹم کی تصدیق شدہ کی خودکار فعال رہے گی۔</p>
                         </div>
                     </div>
 

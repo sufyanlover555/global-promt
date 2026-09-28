@@ -956,25 +956,46 @@ async function loadAdminStats() {
     } catch (_) {}
 }
 
-async function loadAdminUsers() {
+async function loadAdminUsers(filterStatus = null) {
+    if (filterStatus) {
+        const filterSelect = document.getElementById('adminUserStatusFilter');
+        if (filterSelect) filterSelect.value = filterStatus;
+    }
+
     const query = document.getElementById('adminUserSearchInput')?.value || '';
     const status = document.getElementById('adminUserStatusFilter')?.value || 'ALL';
     const plan = document.getElementById('adminUserPlanFilter')?.value || 'ALL';
     const tbody = document.getElementById('adminUsersTableBody');
 
-    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-gray-400">لوڈ ہو رہا ہے...</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-xs text-gray-400"><div class="inline-block animate-spin mr-2">⚡</div> صارفین لوڈ ہو رہے ہیں...</td></tr>`;
 
     try {
         const params = new URLSearchParams({ q: query, status, plan });
-        const res = await fetch(`/api/admin/users?${params.toString()}`, {
+        const res = await apiFetch(`/api/admin/users?${params.toString()}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
-        if (!res.ok) throw new Error('Failed to fetch users');
-        const data = await res.json();
-        currentAdminUsers = data.users || [];
-        renderAdminUsersTable(currentAdminUsers);
+        
+        if (res.ok) {
+            const data = await res.json();
+            currentAdminUsers = data.users || [];
+            // Cache locally so admin panel works offline or during server restarts
+            try { localStorage.setItem('gta_admin_users_cache', JSON.stringify(currentAdminUsers)); } catch (_) {}
+            renderAdminUsersTable(currentAdminUsers);
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'صارفین کی فہرست حاصل نہیں ہو سکی');
+        }
     } catch (err) {
-        if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-red-400">${err.message}</td></tr>`;
+        // Fallback to local cache if available
+        let cached = [];
+        try { cached = JSON.parse(localStorage.getItem('gta_admin_users_cache') || '[]'); } catch (_) {}
+        if (cached && cached.length > 0) {
+            currentAdminUsers = cached;
+            renderAdminUsersTable(currentAdminUsers);
+            showToast("ℹ️ مقامی کیشے سے صارفین دکھائے جا رہے ہیں");
+        } else if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-red-400">⚠️ ${err.message}</td></tr>`;
+        }
     }
 }
 
@@ -983,56 +1004,69 @@ function renderAdminUsersTable(users) {
     if (!tbody) return;
 
     if (!users || users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-xs text-gray-500">کوئی صارف نہیں ملا (No users found)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-xs text-gray-500">کوئی صارف نہیں ملا (No users found in this filter)</td></tr>`;
         return;
     }
 
     let html = '';
     users.forEach(u => {
-        let badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-        if (u.status === 'ACTIVE') badgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-        else if (u.status === 'BLOCKED') badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
-        else if (u.status === 'EXPIRED') badgeColor = 'bg-red-500/20 text-red-400 border-red-500/30';
-        else if (u.status === 'REJECTED') badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
+        let badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        let statusLabel = u.status;
+        if (u.status === 'ACTIVE') {
+            badgeColor = 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.2)]';
+            statusLabel = '● ایکٹو (ACTIVE)';
+        } else if (u.status === 'BLOCKED') {
+            badgeColor = 'bg-red-600/30 text-red-300 border-red-500/60 shadow-[0_0_10px_rgba(239,68,68,0.2)]';
+            statusLabel = '✖ بلاک (BLOCKED)';
+        } else if (u.status === 'EXPIRED') {
+            badgeColor = 'bg-rose-950 text-rose-400 border-rose-600/40';
+            statusLabel = '⚠️ ختم (EXPIRED)';
+        } else if (u.status === 'PENDING') {
+            badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+            statusLabel = '⏳ زیر التواء (PENDING)';
+        }
 
         const startDateFormatted = u.start_date ? new Date(u.start_date).toLocaleDateString() : '-';
         const expiryDateFormatted = u.expiry_date ? new Date(u.expiry_date).toLocaleDateString() : '-';
 
         html += `
         <tr class="border-b border-white/5 hover:bg-white/5 transition text-xs">
-            <td class="p-3 font-bold text-white">${u.name}</td>
-            <td class="p-3 text-gray-300 font-mono">${u.email}</td>
+            <td class="p-3 font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full ${u.status === 'ACTIVE' ? 'bg-emerald-400 animate-pulse' : (u.status === 'BLOCKED' ? 'bg-red-500' : 'bg-amber-400')}"></span>
+                ${u.name}
+            </td>
+            <td class="p-3 text-gray-300 font-mono text-[11px]">${u.email}</td>
             <td class="p-3 font-semibold text-cyan-300">${u.plan || 'Monthly'}</td>
             <td class="p-3 text-gray-300">PKR ${Number(u.price || 3000).toLocaleString()}</td>
             <td class="p-3 text-gray-400 font-mono text-[11px]">${startDateFormatted}</td>
-            <td class="p-3 text-gray-400 font-mono text-[11px]">${expiryDateFormatted} (${u.daysRemaining}d)</td>
+            <td class="p-3 text-gray-400 font-mono text-[11px]">${expiryDateFormatted} <span class="text-cyan-400 font-bold">(${u.daysRemaining}d)</span></td>
             <td class="p-3">
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${badgeColor}">${u.status}</span>
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold border inline-block ${badgeColor}">${statusLabel}</span>
             </td>
             <td class="p-3">
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
                     <button onclick="adminViewUser('${u.id}')" title="تفصیلات" class="px-2 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-[10px] transition cursor-pointer">
                         VIEW
                     </button>
                     ${u.status !== 'ACTIVE' ? `
-                    <button onclick="adminActivateUser('${u.id}')" title="فعال کریں" class="px-2 py-1 bg-emerald-600/80 hover:bg-emerald-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        Activate Subscription
+                    <button onclick="adminActivateUser('${u.id}')" title="اکاؤنٹ فعال کر کے ایکسس دیں" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded text-[10px] transition cursor-pointer shadow">
+                        ✅ ایکسس دیں (ACTIVATE)
                     </button>` : ''}
                     ${u.status !== 'BLOCKED' ? `
-                    <button onclick="adminBlockUser('${u.id}')" title="بلاک کریں" class="px-2 py-1 bg-red-600/80 hover:bg-red-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        BLOCK
+                    <button onclick="adminBlockUser('${u.id}')" title="فوری طور پر صارف کی رسائی بلاک کریں" class="px-2.5 py-1 bg-red-600/90 hover:bg-red-600 text-white font-bold rounded text-[10px] transition cursor-pointer">
+                        🚫 بلاک کریں (BLOCK)
                     </button>` : `
-                    <button onclick="adminUnblockUser('${u.id}')" title="ان بلاک کریں" class="px-2 py-1 bg-cyan-600/80 hover:bg-cyan-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        UNBLOCK
+                    <button onclick="adminUnblockUser('${u.id}')" title="بلاک ختم کر کے رسائی بحال کریں" class="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-[10px] transition cursor-pointer">
+                        🔓 ان بلاک کریں (UNBLOCK)
                     </button>`}
-                    <button onclick="adminOpenExtendModal('${u.id}')" title="سبسکرپشن بڑھائیں" class="px-2 py-1 bg-purple-600/80 hover:bg-purple-500 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                        EXTEND
+                    <button onclick="adminOpenExtendModal('${u.id}')" title="سبسکرپشن کے دن بڑھائیں" class="px-2 py-1 bg-purple-700/80 hover:bg-purple-600 text-white rounded text-[10px] transition cursor-pointer">
+                        ⏳ دن بڑھائیں
                     </button>
-                    <button onclick="adminOpenEditModal('${u.id}')" title="تبدیل کریں" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
-                        EDIT
+                    <button onclick="adminOpenEditModal('${u.id}')" title="ایڈٹ کریں" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-[10px] transition cursor-pointer">
+                        ✏️ ایڈٹ
                     </button>
-                    <button onclick="adminDeleteUser('${u.id}')" title="ڈیلیٹ کریں" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500/50 text-red-300 rounded text-[10px] transition cursor-pointer">
-                        DELETE
+                    <button onclick="adminDeleteUser('${u.id}')" title="مستقل ڈیلیٹ کریں" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-500/40 text-red-300 rounded text-[10px] transition cursor-pointer">
+                        🗑️
                     </button>
                 </div>
             </td>
@@ -1044,20 +1078,20 @@ function renderAdminUsersTable(users) {
 }
 
 async function adminActivateUser(userId) {
-    if (!confirm('کیا آپ واقعی اس صارف کا سبسکرپشن فعال کرنا چاہتے ہیں؟')) return;
+    if (!confirm('کیا آپ واقعی اس صارف کو فوری ایکسس دے کر فعال (ACTIVATE) کرنا چاہتے ہیں؟')) return;
     try {
-        const res = await fetch(`/api/admin/users/${userId}/activate`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/activate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({})
         });
         if (res.ok) {
-            showToast("سبسکرپشن کامیابی سے فعال ہو گیا!");
+            showToast("صارف کامیابی سے فعال (Active) کر دیا گیا!");
             loadAdminStats();
             loadAdminUsers();
         } else {
-            const d = await res.json();
-            alert(d.error);
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ایکٹیویشن ناکام ہو گئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1065,16 +1099,19 @@ async function adminActivateUser(userId) {
 }
 
 async function adminBlockUser(userId) {
-    if (!confirm('کیا آپ واقعی اس صارف کو بلاک کرنا چاہتے ہیں؟ اس کی تمام AI جنریشن فوری بند ہو جائے گی۔')) return;
+    if (!confirm('کیا آپ واقعی اس صارف کو بلاک (BLOCK) کرنا چاہتے ہیں؟ اس کی تمام AI جنریشن اور ٹول رسائی فوری بند ہو جائے گی۔')) return;
     try {
-        const res = await fetch(`/api/admin/users/${userId}/block`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/block`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف بلاک کر دیا گیا!");
+            showToast("صارف کو بلاک (Blocked) کر دیا گیا!");
             loadAdminStats();
             loadAdminUsers();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'بلاک کرنے میں خرابی پیش آئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1083,14 +1120,17 @@ async function adminBlockUser(userId) {
 
 async function adminUnblockUser(userId) {
     try {
-        const res = await fetch(`/api/admin/users/${userId}/unblock`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/unblock`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف ان بلاک کر دیا گیا!");
+            showToast("صارف کی رسائی بحال (Unblocked) کر دی گئی!");
             loadAdminStats();
             loadAdminUsers();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ان بلاک کرنے میں خرابی پیش آئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1100,14 +1140,17 @@ async function adminUnblockUser(userId) {
 async function adminDeleteUser(userId) {
     if (!confirm('کیا آپ واقعی اس صارف کو مستقل طور پر حذف کرنا چاہتے ہیں؟')) return;
     try {
-        const res = await fetch(`/api/admin/users/${userId}`, {
+        const res = await apiFetch(`/api/admin/users/${userId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
-            showToast("صارف ڈیلیٹ کر دیا گیا!");
+            showToast("صارف کامیابی سے ڈیلیٹ کر دیا گیا!");
             loadAdminStats();
             loadAdminUsers();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ڈیلیٹ کرنے میں خرابی پیش آئی');
         }
     } catch (err) {
         alert(err.message);
@@ -1179,7 +1222,7 @@ async function adminSubmitExtend(e) {
     const days = parseInt(document.getElementById('adminExtendDays').value, 10);
 
     try {
-        const res = await fetch(`/api/admin/users/${userId}/extend`, {
+        const res = await apiFetch(`/api/admin/users/${userId}/extend`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({ days })
@@ -1190,8 +1233,8 @@ async function adminSubmitExtend(e) {
             loadAdminStats();
             loadAdminUsers();
         } else {
-            const d = await res.json();
-            alert(d.error);
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'دن بڑھانے میں خرابی');
         }
     } catch (err) {
         alert(err.message);
@@ -1228,7 +1271,7 @@ async function adminSubmitEditUser(e) {
     const password = document.getElementById('adminEditPassword').value;
 
     try {
-        const res = await fetch(`/api/admin/users/${userId}`, {
+        const res = await apiFetch(`/api/admin/users/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({
@@ -1247,8 +1290,8 @@ async function adminSubmitEditUser(e) {
             loadAdminStats();
             loadAdminUsers();
         } else {
-            const d = await res.json();
-            alert(d.error);
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ایڈٹ ناکام ہو گیا');
         }
     } catch (err) {
         alert(err.message);
@@ -1351,7 +1394,7 @@ function closeScreenshotModal() {
 async function adminVerifyPayment(paymentId) {
     if (!confirm('کیا آپ واقعی اس ادائیگی کی تصدیق کر کے صارف کا اکاؤنٹ فعال کرنا چاہتے ہیں؟\n\n- Monthly Plan: +30 Days\n- 6 Months Plan: +6 Calendar Months')) return;
     try {
-        const res = await fetch(`/api/admin/payments/${paymentId}/verify`, {
+        const res = await apiFetch(`/api/admin/payments/${paymentId}/verify`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -1359,6 +1402,9 @@ async function adminVerifyPayment(paymentId) {
             showToast("✓ Payment Approved! صارف کا اکاؤنٹ کامیابی سے فعال ہو گیا۔");
             loadAdminStats();
             loadAdminPayments();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ادائیگی کی تصدیق ناکام');
         }
     } catch (err) {
         alert(err.message);
@@ -1368,7 +1414,7 @@ async function adminVerifyPayment(paymentId) {
 async function adminRejectPayment(paymentId) {
     if (!confirm('کیا آپ واقعی یہ ادائیگی مسترد کرنا چاہتے ہیں؟ اس صارف کا اکاؤنٹ بند رہے گا۔')) return;
     try {
-        const res = await fetch(`/api/admin/payments/${paymentId}/reject`, {
+        const res = await apiFetch(`/api/admin/payments/${paymentId}/reject`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -1376,6 +1422,9 @@ async function adminRejectPayment(paymentId) {
             showToast("✕ Payment Rejected! ادائیگی مسترد کر دی گئی۔");
             loadAdminStats();
             loadAdminPayments();
+        } else {
+            const d = await res.json().catch(() => ({}));
+            alert(d.error || 'ادائیگی مسترد کرنے میں خرابی');
         }
     } catch (err) {
         alert(err.message);
@@ -1415,6 +1464,9 @@ async function loadAdminSettings() {
         if (document.getElementById('setRateLimit')) {
             document.getElementById('setRateLimit').value = s.rate_limit_per_hour || '60';
         }
+        if (document.getElementById('setGroqApiKey')) {
+            document.getElementById('setGroqApiKey').value = s.groq_api_key || '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';
+        }
     } catch (_) {}
 }
 
@@ -1428,7 +1480,8 @@ async function adminSaveSettings(e) {
         plan_monthly_price: document.getElementById('setMonthlyPrice')?.value || '3000',
         plan_6months_price: document.getElementById('set6MonthsPrice')?.value || '15000',
         plan_annual_price: document.getElementById('setAnnualPrice')?.value || '25000',
-        rate_limit_per_hour: document.getElementById('setRateLimit')?.value || '60'
+        rate_limit_per_hour: document.getElementById('setRateLimit')?.value || '60',
+        groq_api_key: document.getElementById('setGroqApiKey')?.value || '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'
     };
 
     try {
@@ -1484,4 +1537,68 @@ async function loadAdminAuditLogs() {
     } catch (err) {
         if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-xs text-red-400">${err.message}</td></tr>`;
     }
+}
+
+// ============================================================
+// ADMIN BACKUP & RESTORE UTILITIES
+// ============================================================
+
+async function adminExportBackup() {
+    try {
+        showToast("بیک اپ تیار ہو رہا ہے...");
+        const res = await apiFetch('/api/admin/export-data', {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) throw new Error('بیک اپ ایکسپورٹ ناکام ہو گیا');
+        const data = await res.json();
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `global_generator_users_backup_${new Date().toISOString().substring(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast("✅ بیک اپ فائل کامیابی سے ڈاؤن لوڈ ہو گئی!");
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+async function adminImportBackup() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const json = JSON.parse(text);
+            
+            if (!confirm(`کیا آپ واقعی اس فائل (${file.name}) سے تمام صارفین اور ڈیٹا بحال (RESTORE) کرنا چاہتے ہیں؟`)) return;
+            
+            showToast("ڈیٹا سرور پر بھیجا جا رہا ہے...");
+            const res = await apiFetch('/api/admin/import-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                body: JSON.stringify(json)
+            });
+            
+            const result = await res.json();
+            if (res.ok) {
+                showToast(`✅ ${result.importedUsers || 'تمام'} صارفین کامیابی سے بحال ہو گئے!`);
+                loadAdminStats();
+                loadAdminUsers();
+            } else {
+                alert(result.error || 'بحالی ناکام ہو گئی');
+            }
+        } catch (err) {
+            alert('غلط بیک اپ فائل یا پروسیسنگ خرابی: ' + err.message);
+        }
+    };
+    input.click();
 }

@@ -102,7 +102,8 @@ const defaultSettings = [
     { key: 'easypaisa_account_name', value: 'سفیان حبیب (Sufyan Habib)' },
     { key: 'easypaisa_account_number', value: '03008998381' },
     { key: 'support_contact', value: 'WhatsApp: 03008998381' },
-    { key: 'payment_instructions', value: 'Easypaisa کے ذریعے اپنے منتخب کردہ Plan کی رقم ادا کریں۔ رقم بھیجنے کے بعد Transaction ID اور تاریخ درج کریں اور رسید کا اسکرین شاٹ منسلک کریں۔' }
+    { key: 'payment_instructions', value: 'Easypaisa کے ذریعے اپنے منتخب کردہ Plan کی رقم ادا کریں۔ رقم بھیجنے کے بعد Transaction ID اور تاریخ درج کریں اور رسید کا اسکرین شاٹ منسلک کریں۔' },
+    { key: 'groq_api_key', value: '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' }
 ];
 
 const checkSettingStmt = db.prepare('SELECT value FROM admin_settings WHERE key = ?');
@@ -112,6 +113,8 @@ for (const s of defaultSettings) {
     const existing = checkSettingStmt.get(s.key);
     if (!existing) {
         insertSettingStmt.run(s.key, s.value, new Date().toISOString());
+    } else if (s.key === 'groq_api_key' && (!existing.value || existing.value.trim() === '' || existing.value.startsWith('YOUR_'))) {
+        db.prepare('UPDATE admin_settings SET value = ?, updated_at = ? WHERE key = ?').run(s.value, new Date().toISOString(), s.key);
     }
 }
 
@@ -133,7 +136,38 @@ function verifyPassword(password, hash, salt) {
     }
 }
 
-function generateToken() {
+const JWT_SECRET = process.env.JWT_SECRET || 'GLOBAL_GEN_SECRET_98381_SUFYAN_KEY_SECURE_2026';
+
+function signStatelessToken(payload) {
+    const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+    const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const signature = crypto.createHmac('sha256', JWT_SECRET).update(`${header}.${body}`).digest('base64url');
+    return `${header}.${body}.${signature}`;
+}
+
+function verifyStatelessToken(token) {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const [header, body, signature] = parts;
+    try {
+        const expectedSig = crypto.createHmac('sha256', JWT_SECRET).update(`${header}.${body}`).digest('base64url');
+        if (signature.length !== expectedSig.length) return null;
+        if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+            return null;
+        }
+        const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+        if (payload.exp && Date.now() > payload.exp) {
+            return null;
+        }
+        return payload;
+    } catch {
+        return null;
+    }
+}
+
+function generateToken(payload = null) {
+    if (payload) return signStatelessToken(payload);
     return crypto.randomBytes(32).toString('hex');
 }
 
@@ -285,37 +319,98 @@ function getUserByEmail(email) {
 }
 
 function createSession(userId, expiresInDays = 30) {
-    const token = generateToken();
+    const adminEmail = (process.env.INITIAL_ADMIN_EMAIL || 'sufyanhbl143@gmail.com').toLowerCase().trim();
+    const user = getUserById(userId) || (userId === 'admin_master' ? getUserByEmail(adminEmail) : null);
     const now = new Date();
     const expiresAt = new Date(now.getTime() + expiresInDays * 24 * 60 * 60 * 1000);
+    const isAdmin = (user && user.role === 'ADMIN') || userId === 'admin_master' || (user && user.email === adminEmail);
 
-    db.prepare(`
-        INSERT INTO sessions (token, user_id, expires_at, created_at)
-        VALUES (?, ?, ?, ?)
-    `).run(token, userId, expiresAt.toISOString(), now.toISOString());
+    // Issue cryptographic stateless token containing role, user ID, and expiration
+    const token = signStatelessToken({
+        uid: user ? user.id : userId,
+        email: user ? user.email : (isAdmin ? adminEmail : ''),
+        role: isAdmin ? 'ADMIN' : (user ? user.role : 'USER'),
+        name: user ? user.name : (isAdmin ? 'سفیان حبیب (Sufyan Habib)' : ''),
+        exp: expiresAt.getTime()
+    });
+
+    try {
+        db.prepare(`
+            INSERT OR REPLACE INTO sessions (token, user_id, expires_at, created_at)
+            VALUES (?, ?, ?, ?)
+        `).run(token, userId, expiresAt.toISOString(), now.toISOString());
+    } catch (_) {
+        // Safe to ignore in stateless or read-only edge runtimes
+    }
 
     return { token, expiresAt: expiresAt.toISOString() };
 }
 
 function validateSession(token) {
     if (!token) return null;
-    const session = db.prepare(`
-        SELECT token, user_id, expires_at FROM sessions WHERE token = ?
-    `).get(token);
 
-    if (!session) return null;
+    // 1. Check stateless cryptographic token first
+    const payload = verifyStatelessToken(token);
+    if (payload) {
+        if (payload.role === 'ADMIN') {
+            const dbAdmin = getUserByEmail(payload.email) || (payload.uid ? getUserById(payload.uid) : null);
+            if (dbAdmin) {
+                return { ...dbAdmin, role: 'ADMIN', status: 'ACTIVE' };
+            }
+            // Guaranteed admin fallback for serverless cold instances
+            return {
+                id: payload.uid || 'admin_master',
+                name: payload.name || 'سفیان حبیب (Sufyan Habib)',
+                email: payload.email || 'sufyanhbl143@gmail.com',
+                role: 'ADMIN',
+                status: 'ACTIVE',
+                subscription: {
+                    plan: 'Annual',
+                    status: 'ACTIVE',
+                    daysRemaining: 365,
+                    expiry_date: new Date(Date.now() + 365 * 86400000).toISOString()
+                }
+            };
+        }
 
-    if (new Date() > new Date(session.expires_at)) {
-        db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
-        return null;
+        // For regular user: check DB if available (to respect blocks and deletions)
+        const user = (payload.uid ? getUserById(payload.uid) : null) || getUserByEmail(payload.email);
+        if (user) {
+            return user;
+        }
+        return {
+            id: payload.uid,
+            name: payload.name,
+            email: payload.email,
+            role: payload.role || 'USER',
+            status: 'ACTIVE'
+        };
     }
 
-    return getUserById(session.user_id);
+    // 2. Fallback to database sessions table
+    try {
+        const session = db.prepare(`
+            SELECT token, user_id, expires_at FROM sessions WHERE token = ?
+        `).get(token);
+
+        if (!session) return null;
+
+        if (new Date() > new Date(session.expires_at)) {
+            try { db.prepare('DELETE FROM sessions WHERE token = ?').run(token); } catch (_) {}
+            return null;
+        }
+
+        return getUserById(session.user_id);
+    } catch (_) {
+        return null;
+    }
 }
 
 function deleteSession(token) {
     if (!token) return;
-    db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+    try {
+        db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+    } catch (_) {}
 }
 
 // ============================================================
@@ -627,7 +722,7 @@ function getAdminStats() {
     };
 }
 
-function searchUsers({ query = '', status = '', plan = '', limit = 100 }) {
+function searchUsers({ query = '', status = '', plan = '', limit = 100, includeAdmin = false } = {}) {
     let sql = `
         SELECT u.id, u.name, u.email, u.role, u.status, u.created_at,
                s.plan, s.price, s.start_date, s.expiry_date, s.status as sub_status
@@ -635,9 +730,13 @@ function searchUsers({ query = '', status = '', plan = '', limit = 100 }) {
         LEFT JOIN subscriptions s ON s.user_id = u.id AND s.id = (
             SELECT id FROM subscriptions WHERE user_id = u.id ORDER BY created_at DESC LIMIT 1
         )
-        WHERE u.role = 'USER'
+        WHERE 1=1
     `;
     const params = [];
+
+    if (!includeAdmin) {
+        sql += ` AND u.role = 'USER'`;
+    }
 
     if (query && query.trim()) {
         sql += ` AND (u.name LIKE ? OR u.email LIKE ?)`;
@@ -707,7 +806,10 @@ function submitPayment({ userId, plan, amount, paymentMethod, transactionReferen
     return { id: paymentId, status: 'PENDING' };
 }
 
-function getPayments(status = null) {
+function getPayments(options = null) {
+    let status = (typeof options === 'string') ? options : (options && typeof options === 'object' ? options.status : null);
+    let limit = (options && typeof options === 'object' && options.limit) ? options.limit : 100;
+
     let sql = `
         SELECT p.id, p.user_id, p.plan, p.amount, p.payment_method, p.payment_status,
                p.transaction_reference, p.payment_date, p.screenshot_url, p.created_at, p.verified_at, p.verified_by,
@@ -720,7 +822,8 @@ function getPayments(status = null) {
         sql += ` WHERE p.payment_status = ?`;
         params.push(status);
     }
-    sql += ` ORDER BY p.created_at DESC LIMIT 100`;
+    sql += ` ORDER BY p.created_at DESC LIMIT ?`;
+    params.push(limit);
 
     return db.prepare(sql).all(...params);
 }
@@ -830,10 +933,162 @@ function checkRateLimit(userId) {
     return { allowed: true, remaining: maxPerHour - count };
 }
 
+// ============================================================
+// SYSTEM AUTO-SEEDING & MASTER ADMIN GUARANTEE
+// ============================================================
+
+function ensureMasterAdmin() {
+    try {
+        const adminEmail = (process.env.INITIAL_ADMIN_EMAIL || 'sufyanhbl143@gmail.com').toLowerCase().trim();
+        const adminPass = process.env.INITIAL_ADMIN_PASSWORD || 'Thepak@100';
+        const adminName = 'سفیان حبیب (Sufyan Habib)';
+
+        const existing = getUserByEmail(adminEmail);
+        if (!existing) {
+            console.log(`[DB Auto-Init] Auto-creating Master Admin account for: ${adminEmail}`);
+            const newAdmin = createUser({
+                name: adminName,
+                email: adminEmail,
+                password: adminPass,
+                role: 'ADMIN',
+                status: 'ACTIVE',
+                plan: 'Annual'
+            });
+            activateUserSubscription(newAdmin.id, 'Annual', 'AUTO_INIT');
+            console.log(`[DB Auto-Init] Master Admin initialized successfully.`);
+        } else {
+            // Guarantee role is ADMIN and status is ACTIVE
+            if (existing.role !== 'ADMIN' || existing.status !== 'ACTIVE') {
+                updateUser(existing.id, { role: 'ADMIN', status: 'ACTIVE' }, 'AUTO_INIT');
+            }
+        }
+    } catch (err) {
+        console.warn('[Ensure Master Admin Warn]:', err.message);
+    }
+}
+
+function autoSeedDatabaseIfEmpty() {
+    try {
+        // If on Vercel and local database.sqlite exists, try to copy it if tmp database is fresh
+        if (isVercel) {
+            const localDbFile = path.join(__dirname, 'database.sqlite');
+            if (fs.existsSync(localDbFile) && (!fs.existsSync(dbPath) || fs.statSync(dbPath).size < 10000)) {
+                try {
+                    fs.copyFileSync(localDbFile, dbPath);
+                    console.log('[DB Auto-Init] Seeded SQLite database from bundled database.sqlite');
+                } catch (copyErr) {
+                    console.warn('[DB Copy Warning]:', copyErr.message);
+                }
+            }
+        }
+
+        const count = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+        if (count === 0) {
+            const seedPath = path.join(__dirname, 'data_seed.json');
+            if (fs.existsSync(seedPath)) {
+                console.log('[DB Auto-Init] Loading seed data from data_seed.json...');
+                const seedRaw = fs.readFileSync(seedPath, 'utf8');
+                const seed = JSON.parse(seedRaw);
+
+                if (Array.isArray(seed.users)) {
+                    for (const u of seed.users) {
+                        try {
+                            const salt = crypto.randomBytes(16).toString('hex');
+                            const hash = crypto.scryptSync('Pakistan@123', salt, 64).toString('hex');
+                            const now = new Date().toISOString();
+                            db.prepare(`
+                                INSERT OR IGNORE INTO users (id, name, email, password_hash, salt, role, status, created_at, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            `).run(u.id, u.name, u.email, hash, salt, u.role || 'USER', u.status || 'ACTIVE', u.created_at || now, now);
+
+                            if (u.plan) {
+                                const subId = crypto.randomUUID();
+                                const start = u.start_date || now;
+                                const expiry = u.expiry_date || new Date(Date.now() + (u.daysRemaining || 30) * 86400000).toISOString();
+                                db.prepare(`
+                                    INSERT OR IGNORE INTO subscriptions (id, user_id, plan, price, start_date, expiry_date, status, created_at, updated_at)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                `).run(subId, u.id, u.plan, u.price || 3000, start, expiry, u.status || 'ACTIVE', start, now);
+                            }
+                        } catch (err) {
+                            console.warn('[Seed User Warn]:', err.message);
+                        }
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        console.warn('[Auto-Seed Warning]:', err.message);
+    }
+
+    ensureMasterAdmin();
+}
+
+function exportAllData() {
+    return {
+        exportedAt: new Date().toISOString(),
+        users: searchUsers({ limit: 10000, includeAdmin: true }),
+        settings: getAllSettings(),
+        payments: getPayments({ limit: 10000 })
+    };
+}
+
+function importAllData(data) {
+    if (!data || typeof data !== 'object') throw new Error('Invalid data payload');
+    const now = new Date().toISOString();
+    let importedUsers = 0;
+
+    if (Array.isArray(data.users)) {
+        for (const u of data.users) {
+            try {
+                const existing = db.prepare('SELECT id FROM users WHERE id = ? OR email = ?').get(u.id, (u.email || '').toLowerCase().trim());
+                if (existing) {
+                    db.prepare(`
+                        UPDATE users SET name = ?, email = ?, role = ?, status = ?, updated_at = ?
+                        WHERE id = ?
+                    `).run(u.name, (u.email || '').toLowerCase().trim(), u.role || 'USER', u.status || 'ACTIVE', now, existing.id);
+
+                    if (u.plan) {
+                        const sub = getLatestSubscription(existing.id);
+                        if (sub) {
+                            db.prepare(`
+                                UPDATE subscriptions SET plan = ?, price = ?, expiry_date = ?, status = ?, updated_at = ?
+                                WHERE id = ?
+                            `).run(u.plan, u.price || 3000, u.expiry_date || sub.expiry_date, u.status || 'ACTIVE', now, sub.id);
+                        }
+                    }
+                } else {
+                    const salt = crypto.randomBytes(16).toString('hex');
+                    const hash = crypto.scryptSync('Pakistan@123', salt, 64).toString('hex');
+                    db.prepare(`
+                        INSERT INTO users (id, name, email, password_hash, salt, role, status, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    `).run(u.id || crypto.randomUUID(), u.name, (u.email || '').toLowerCase().trim(), hash, salt, u.role || 'USER', u.status || 'ACTIVE', u.created_at || now, now);
+                }
+                importedUsers++;
+            } catch (err) {
+                console.warn('[Import User Warn]:', err.message);
+            }
+        }
+    }
+
+    if (data.settings && typeof data.settings === 'object') {
+        updateSettingsBatch(data.settings);
+    }
+
+    ensureMasterAdmin();
+    return { success: true, importedUsers };
+}
+
+// Run auto-seed on module initialization
+autoSeedDatabaseIfEmpty();
+
 module.exports = {
     db,
     hashPassword,
     verifyPassword,
+    signStatelessToken,
+    verifyStatelessToken,
     createUser,
     getUserById,
     getUserByEmail,
@@ -863,5 +1118,9 @@ module.exports = {
     logAudit,
     getAuditLogs,
     recordUsage,
-    checkRateLimit
+    checkRateLimit,
+    ensureMasterAdmin,
+    autoSeedDatabaseIfEmpty,
+    exportAllData,
+    importAllData
 };
